@@ -140,21 +140,6 @@ dsh-ds-whale/
 - 改 `lib/index.js`：需要重载 Host 半（插件管理器里关/开一次该插件）。
 - 立绘：把原图丢给 `tools/make-avatar.py <原图> <输出目录>`，会做边缘泛洪去白底 + 裁 bbox + 导出 512/128/64，然后覆盖 `assets/`。
 
-## 📦 发版 / Release
-
-发版靠 tag 驱动，CI 自己打包，**仓库里不需要任何本地脚本**。手工三步：
-
-```bash
-# 1) 改版本号：package.json 的 version、lib/index.js 里 2 处 version、lib/client.js 的 BUILD
-# 2) CHANGELOG.md 顶部插一段 "## 0.9.3 — 日期"
-node --check lib/index.js && node --check lib/client.js
-git add -A && git commit -m "chore(release): v0.9.3"
-git tag -a v0.9.3 -m "v0.9.3"
-git push origin main && git push origin v0.9.3
-```
-
-推 `v*` tag 之后由 `.github/workflows/release.yml` 接手：校验 tag 与 `package.json` 版本一致 → 按 `package.json` 的 `files` 打 zip（正斜杠、根层 `package.json`，仓库里的草稿/图片不会进包）→ 用 CHANGELOG 段落 + 上一 tag 以来的提交生成说明 → `gh release create`。`0.x` 一律自动标 **pre-release**，1.0 以后转正式版；网页上不需要点任何东西。
-
 ## 📄 License
 
 [MIT](LICENSE) © 2026 Iceseas
