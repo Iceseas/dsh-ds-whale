@@ -142,44 +142,18 @@ dsh-ds-whale/
 
 ## 📦 发版 / Release
 
-只需要 Node（无需 PowerShell、无需 python）。三条路，任选：
-
-**① 一条命令（推荐）**
+发版靠 tag 驱动，CI 自己打包，**仓库里不需要任何本地脚本**。手工三步：
 
 ```bash
-# 修 bug
-node scripts/release.mjs patch -m "修复左边气泡被裁"
-# 加功能
-node scripts/release.mjs minor -m "新增某某功能"
-# 指定版本号
-node scripts/release.mjs 0.9.5 -m "……"
-# 只演练，看完自动还原
-node scripts/release.mjs patch --dry-run
-```
-
-它负责：改 `package.json` / `lib/index.js` 的版本号 → 改 `lib/client.js` 的 `BUILD` 标记 → 往 `CHANGELOG.md` 顶部插一段 → `node --check` → `git commit` → `git tag -a` → `git push`。
-
-**② npm 脚本（同一条流水线）**
-
-```bash
-npm run release -- patch -m "修复左边气泡被裁"
-npm run release:dry -- patch          # 演练
-```
-
-**③ 不装脚本，纯手工**
-
-```bash
-# 1. 改三处版本号：package.json 的 version、lib/index.js 的 2 处 version、lib/client.js 的 BUILD
-# 2. CHANGELOG.md 顶部插一段 "## 0.9.2 — 日期"
+# 1) 改版本号：package.json 的 version、lib/index.js 里 2 处 version、lib/client.js 的 BUILD
+# 2) CHANGELOG.md 顶部插一段 "## 0.9.3 — 日期"
 node --check lib/index.js && node --check lib/client.js
-git add -A && git commit -m "chore(release): v0.9.2"
-git tag -a v0.9.2 -m "v0.9.2"
-git push origin main && git push origin v0.9.2
+git add -A && git commit -m "chore(release): v0.9.3"
+git tag -a v0.9.3 -m "v0.9.3"
+git push origin main && git push origin v0.9.3
 ```
 
-**推 tag 之后由 CI 接手**（`.github/workflows/release.yml`）：校验 tag 与 `package.json` 版本一致 → `scripts/pack-release.mjs` 打包 → `scripts/make-notes.mjs` 生成说明 → `gh release create`。`0.x` 一律自动标 **pre-release**，1.0 以后转正式版；不需要在网页上点任何东西。
-
-本机单独打包（不发版）用 `node scripts/pack-release.mjs <版本> --out-dir dist`，或 `npm run pack -- <版本>`。
+推 `v*` tag 之后由 `.github/workflows/release.yml` 接手：校验 tag 与 `package.json` 版本一致 → 按 `package.json` 的 `files` 打 zip（正斜杠、根层 `package.json`，仓库里的草稿/图片不会进包）→ 用 CHANGELOG 段落 + 上一 tag 以来的提交生成说明 → `gh release create`。`0.x` 一律自动标 **pre-release**，1.0 以后转正式版；网页上不需要点任何东西。
 
 ## 📄 License
 

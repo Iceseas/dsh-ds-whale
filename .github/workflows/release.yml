@@ -1,7 +1,8 @@
 name: release
 
-# 只需推一个 tag：git tag v0.9.1 && git push origin v0.9.1
-# 这个 workflow 会自动校验版本号、打包 zip、生成 Release（含自动变更说明）
+# 只需推一个 tag：git tag -a v0.9.3 -m "v0.9.3" && git push origin v0.9.3
+# 这个 workflow 会校验版本号、打包 zip、生成 Release（说明取自 CHANGELOG + 提交历史）。
+# 它不依赖仓库里的任何本地脚本，全部逻辑都在这里。
 on:
   push:
     tags:
@@ -30,22 +31,30 @@ jobs:
           PKG=$(node -p "require('./package.json').version")
           echo "tag=$TAG pkg=$PKG"
           if [ "$TAG" != "$PKG" ]; then
-            echo "::error::tag v$TAG 与 package.json 里的 $PKG 不一致，先跑 scripts/release.ps1 或手动改版本号"
+            echo "::error::tag v$TAG 与 package.json 里的 $PKG 不一致"
             exit 1
           fi
           MAJOR="${TAG%%.*}"
           PRE="false"
           case "$TAG" in
-            *-*) PRE="true" ;;                     # 0.9.1-rc1 这类预发布
-            *) if [ "$MAJOR" = "0" ]; then PRE="true"; fi ;;   # 0.x 一律算开发版
+            *-*) PRE="true" ;;
+            *) if [ "$MAJOR" = "0" ]; then PRE="true"; fi ;;
           esac
           echo "prerelease=$PRE" >> "$GITHUB_OUTPUT"
           echo "version=$TAG" >> "$GITHUB_OUTPUT"
 
-      - name: 打包 zip（正斜杠、根层 package.json、排除 .git）
-        run: node scripts/pack-release.mjs "$VERSION"
+      - name: 打包 zip（根层 package.json、只取 package.json 的 files）
         env:
           VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          set -euo pipefail
+          # 清单 = package.json 的 files + package.json 自己；不扫目录，仓库里的杂物进不去
+          node -e "const p=require('./package.json');const fs=require('fs');const l=[...p.files,'package.json'];for(const f of l){if(!fs.existsSync(f)){console.error('::error::缺少文件 '+f);process.exit(1)}}fs.writeFileSync('ziplist.txt',l.join('\n')+'\n');console.log('打包 '+l.length+' 个文件')"
+          zip -q -X -r "dsh-ds-whale-$VERSION.zip" -@ < ziplist.txt
+          echo "--- zip 内容 ---"
+          unzip -l "dsh-ds-whale-$VERSION.zip" | sed -n '1,30p'
+          echo "size=$(wc -c < "dsh-ds-whale-$VERSION.zip") bytes"
+          unzip -l "dsh-ds-whale-$VERSION.zip" | grep -q ' package.json$' || { echo '::error::package.json 不在 zip 根层'; exit 1; }
 
       - name: 生成 Release
         env:
@@ -54,12 +63,32 @@ jobs:
           PRERELEASE: ${{ steps.ver.outputs.prerelease }}
         run: |
           set -euo pipefail
-          node scripts/make-notes.mjs "$VERSION" --out notes.md
-          cat notes.md
+          PREV=$(git tag --sort=-v:refname | grep -v "^v$VERSION$" | head -n1 || true)
+          if [ -n "$PREV" ]; then RANGE="$PREV..v$VERSION"; else RANGE="v$VERSION"; fi
+          NOTES="notes.md"
+          {
+            echo "## v$VERSION"
+            echo
+            # CHANGELOG 里本版那一段（到下一个二级标题为止）
+            sed -n "/^## $VERSION/,/^## /p" CHANGELOG.md | sed '$d'
+            echo
+            echo "### 变更提交"
+            echo
+            git log "$RANGE" --no-merges --pretty='- %s (%h)' | sed -n '1,40p'
+            echo
+            echo "### 安装"
+            echo
+            echo '```bash'
+            echo "dsh plugin add github:Iceseas/dsh-ds-whale#v$VERSION"
+            echo '```'
+            echo
+            echo "免 git 安装：下载下方 \`dsh-ds-whale-$VERSION.zip\`，把整份内容合并进 \`<DSH_HOME>/profiles/<profile>/node_modules/dsh-ds-whale/\`，重启 DSH 即可。"
+          } > "$NOTES"
+          cat "$NOTES"
           PRE_FLAG=""
           if [ "$PRERELEASE" = "true" ]; then PRE_FLAG="--prerelease"; fi
           gh release create "v$VERSION" \
             "dsh-ds-whale-$VERSION.zip" \
             --title "v$VERSION" \
-            --notes-file notes.md \
+            --notes-file "$NOTES" \
             $PRE_FLAG

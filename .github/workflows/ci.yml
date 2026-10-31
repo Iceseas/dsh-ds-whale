@@ -20,12 +20,15 @@ jobs:
         run: |
           node --check lib/index.js
           node --check lib/client.js
-          node --check scripts/release.mjs
-          node --check scripts/pack-release.mjs
-          node --check scripts/make-notes.mjs
 
-      - name: 打包脚本自检
-        run: node scripts/pack-release.mjs "$(node -p "require('./package.json').version")" --out-dir dist
+      - name: 发布包文件清单自检
+        run: |
+          node -e "
+          const p = require('./package.json');
+          const fs = require('fs');
+          for (const f of [...p.files, 'package.json']) if (!fs.existsSync(f)) { console.error('✗ files 里列了不存在的文件 ' + f); process.exit(1); }
+          console.log('打包清单 ok: ' + (p.files.length + 1) + ' 个文件');
+          "
 
       - name: JSON 校验
         run: |

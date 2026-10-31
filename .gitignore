@@ -28,3 +28,6 @@ desktop.ini
 # build output
 dist/
 *.zip
+
+# 维护者本地脚本：只在本机用，不随仓库发布
+scripts/
