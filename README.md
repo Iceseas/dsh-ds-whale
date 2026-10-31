@@ -140,6 +140,47 @@ dsh-ds-whale/
 - 改 `lib/index.js`：需要重载 Host 半（插件管理器里关/开一次该插件）。
 - 立绘：把原图丢给 `tools/make-avatar.py <原图> <输出目录>`，会做边缘泛洪去白底 + 裁 bbox + 导出 512/128/64，然后覆盖 `assets/`。
 
+## 📦 发版 / Release
+
+只需要 Node（无需 PowerShell、无需 python）。三条路，任选：
+
+**① 一条命令（推荐）**
+
+```bash
+# 修 bug
+node scripts/release.mjs patch -m "修复左边气泡被裁"
+# 加功能
+node scripts/release.mjs minor -m "新增某某功能"
+# 指定版本号
+node scripts/release.mjs 0.9.5 -m "……"
+# 只演练，看完自动还原
+node scripts/release.mjs patch --dry-run
+```
+
+它负责：改 `package.json` / `lib/index.js` 的版本号 → 改 `lib/client.js` 的 `BUILD` 标记 → 往 `CHANGELOG.md` 顶部插一段 → `node --check` → `git commit` → `git tag -a` → `git push`。
+
+**② npm 脚本（同一条流水线）**
+
+```bash
+npm run release -- patch -m "修复左边气泡被裁"
+npm run release:dry -- patch          # 演练
+```
+
+**③ 不装脚本，纯手工**
+
+```bash
+# 1. 改三处版本号：package.json 的 version、lib/index.js 的 2 处 version、lib/client.js 的 BUILD
+# 2. CHANGELOG.md 顶部插一段 "## 0.9.2 — 日期"
+node --check lib/index.js && node --check lib/client.js
+git add -A && git commit -m "chore(release): v0.9.2"
+git tag -a v0.9.2 -m "v0.9.2"
+git push origin main && git push origin v0.9.2
+```
+
+**推 tag 之后由 CI 接手**（`.github/workflows/release.yml`）：校验 tag 与 `package.json` 版本一致 → `scripts/pack-release.mjs` 打包 → `scripts/make-notes.mjs` 生成说明 → `gh release create`。`0.x` 一律自动标 **pre-release**，1.0 以后转正式版；不需要在网页上点任何东西。
+
+本机单独打包（不发版）用 `node scripts/pack-release.mjs <版本> --out-dir dist`，或 `npm run pack -- <版本>`。
+
 ## 📄 License
 
 [MIT](LICENSE) © 2026 Iceseas

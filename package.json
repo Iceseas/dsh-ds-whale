@@ -5,6 +5,11 @@
   "description": "DeepSeek 余额 / 用量挂件（DSH 插件）：余额、官网口径今日用量、每轮消耗拟人播报、峰谷定价倒计时，四状态立绘。",
   "type": "module",
   "main": "lib/index.js",
+  "scripts": {
+    "release": "node scripts/release.mjs",
+    "release:dry": "node scripts/release.mjs --dry-run",
+    "pack": "node scripts/pack-release.mjs"
+  },
   "exports": {
     ".": "./lib/index.js",
     "./client": "./lib/client.js",

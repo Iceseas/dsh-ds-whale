@@ -43,7 +43,7 @@ jobs:
           echo "version=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: 打包 zip（正斜杠、根层 package.json、排除 .git）
-        run: python3 scripts/pack-release.py "$VERSION"
+        run: node scripts/pack-release.mjs "$VERSION"
         env:
           VERSION: ${{ steps.ver.outputs.version }}
 
@@ -54,7 +54,7 @@ jobs:
           PRERELEASE: ${{ steps.ver.outputs.prerelease }}
         run: |
           set -euo pipefail
-          python3 scripts/make-notes.py "$VERSION" --out notes.md
+          node scripts/make-notes.mjs "$VERSION" --out notes.md
           cat notes.md
           PRE_FLAG=""
           if [ "$PRERELEASE" = "true" ]; then PRE_FLAG="--prerelease"; fi
