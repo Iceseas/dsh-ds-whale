@@ -1,0 +1,75 @@
+{
+  "name": "dsh-ds-whale",
+  "version": "0.9.0",
+  "private": true,
+  "description": "DeepSeek 余额 / 用量挂件（DSH 插件）：余额、官网口径今日用量、每轮消耗拟人播报、峰谷定价倒计时，四状态立绘。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "assets/whale.png",
+    "assets/whale-128.png",
+    "assets/whale-64.png",
+    "assets/whale-angry.png",
+    "assets/whale-angry-128.png",
+    "assets/whale-blush.png",
+    "assets/whale-blush-128.png",
+    "assets/whale-panic.png",
+    "assets/whale-panic-128.png",
+    "locale/zh.json",
+    "locale/en.json",
+    "cordis.patch.yml",
+    "icon.svg",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "keywords": [
+    "dsh-plugin",
+    "dsh",
+    "deepseek",
+    "balance",
+    "usage",
+    "widget",
+    "whale",
+    "peak-pricing"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-connection",
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  },
+  "author": "Iceseas (https://github.com/Iceseas)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Iceseas/dsh-ds-whale.git"
+  },
+  "homepage": "https://github.com/Iceseas/dsh-ds-whale#readme",
+  "bugs": {
+    "url": "https://github.com/Iceseas/dsh-ds-whale/issues"
+  }
+}

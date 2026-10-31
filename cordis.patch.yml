@@ -1,0 +1,5 @@
+# dsh-ds-whale 的 loader 行
+- insert:
+    - id: dsh-ds-whale
+      name: 'dsh-ds-whale'
+      config: {}

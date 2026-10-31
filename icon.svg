@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="DeepSeek Whale">
+  <defs>
+    <radialGradient id="g" cx="32%" cy="22%" r="88%">
+      <stop offset="0%" stop-color="#7cc0ff"/>
+      <stop offset="46%" stop-color="#2f6bff"/>
+      <stop offset="100%" stop-color="#1b3fd6"/>
+    </radialGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#g)"/>
+  <ellipse cx="64" cy="82" rx="34" ry="13" fill="rgba(255,255,255,0.16)"/>
+  <path d="M28 70c0-17 15-30 34-30 20 0 33 11 36 24 3 0 9-3 12-9 1 11-4 19-12 23-4 8-17 13-33 13-22 0-37-9-37-21z" fill="#ffffff"/>
+  <path d="M92 44c3-7 9-11 15-11-2 4-2 8 0 12-5 2-11 2-15-1z" fill="#ffffff"/>
+  <circle cx="76" cy="60" r="4.6" fill="#12327f"/>
+  <circle cx="77.8" cy="58.2" r="1.5" fill="#ffffff"/>
+  <path d="M40 76c6 5 17 8 27 8" stroke="#12327f" stroke-opacity="0.35" stroke-width="3" stroke-linecap="round" fill="none"/>
+</svg>
