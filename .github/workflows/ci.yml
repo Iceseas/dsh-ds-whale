@@ -1,0 +1,49 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 语法检查
+        run: |
+          node --check lib/index.js
+          node --check lib/client.js
+
+      - name: JSON 校验
+        run: |
+          node -e "for (const f of ['package.json','locale/zh.json','locale/en.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('json ok')"
+
+      - name: bundle 元信息自检
+        run: |
+          node -e "
+          const p = require('./package.json');
+          const fail = (m) => { console.error('✗ ' + m); process.exit(1); };
+          if (!p.dsh || !p.dsh.bundle || !p.dsh.bundle.patch) fail('缺少 dsh.bundle.patch');
+          if (!p.dsh.client || p.dsh.client.platform !== 'web') fail('缺少 dsh.client.platform=web');
+          const fs = require('fs');
+          for (const f of ['cordis.patch.yml', 'lib/index.js', 'lib/client.js', 'icon.svg', 'locale/zh.json', 'locale/en.json'])
+            if (!fs.existsSync(f)) fail('缺文件 ' + f);
+          for (const f of p.files) if (!fs.existsSync(f)) fail('files 里列了不存在的文件 ' + f);
+          console.log('bundle ok: v' + p.version);
+          "
+
+      - name: 敏感信息扫描
+        run: |
+          if grep -rInE 'sk-[A-Za-z0-9]{16,}|Bearer [A-Za-z0-9_-]{20,}|[0-9a-f]{32,}' \
+               --include='*.js' --include='*.json' --include='*.yml' --include='*.md' . ; then
+            echo '::error::检测到疑似密钥/长十六进制串，请检查上面命中行'
+            exit 1
+          fi
+          echo 'no secrets found'

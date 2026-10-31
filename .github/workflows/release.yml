@@ -1,0 +1,65 @@
+name: release
+
+# 只需推一个 tag：git tag v0.9.1 && git push origin v0.9.1
+# 这个 workflow 会自动校验版本号、打包 zip、生成 Release（含自动变更说明）
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 生成变更说明需要完整历史
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 校验 tag 与 package.json 版本一致
+        id: ver
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG=$(node -p "require('./package.json').version")
+          echo "tag=$TAG pkg=$PKG"
+          if [ "$TAG" != "$PKG" ]; then
+            echo "::error::tag v$TAG 与 package.json 里的 $PKG 不一致，先跑 scripts/release.ps1 或手动改版本号"
+            exit 1
+          fi
+          MAJOR="${TAG%%.*}"
+          PRE="false"
+          case "$TAG" in
+            *-*) PRE="true" ;;                     # 0.9.1-rc1 这类预发布
+            *) if [ "$MAJOR" = "0" ]; then PRE="true"; fi ;;   # 0.x 一律算开发版
+          esac
+          echo "prerelease=$PRE" >> "$GITHUB_OUTPUT"
+          echo "version=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: 打包 zip（正斜杠、根层 package.json、排除 .git）
+        run: python3 scripts/pack-release.py "$VERSION"
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+
+      - name: 生成 Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.ver.outputs.version }}
+          PRERELEASE: ${{ steps.ver.outputs.prerelease }}
+        run: |
+          set -euo pipefail
+          python3 scripts/make-notes.py "$VERSION" --out notes.md
+          cat notes.md
+          PRE_FLAG=""
+          if [ "$PRERELEASE" = "true" ]; then PRE_FLAG="--prerelease"; fi
+          gh release create "v$VERSION" \
+            "dsh-ds-whale-$VERSION.zip" \
+            --title "v$VERSION" \
+            --notes-file notes.md \
+            $PRE_FLAG

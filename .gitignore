@@ -1,31 +1,30 @@
-# 依赖
 node_modules/
 pnpm-lock.yaml
 package-lock.json
 yarn.lock
 
-# 原始素材（去底脚本的输入，体积大，不随仓库发布）
 assets-src/
 *.psd
 *.ai
 
-# 本地临时产物 / 调试脚本
 _tmp-*
 *.log
 *.tmp
 .tsbuildinfo
 
-# 系统与编辑器
 .DS_Store
 Thumbs.db
 desktop.ini
 .vscode/
 .idea/
 
-# 任何本地凭据都不要进来
 .env
 .env.*
 *.key
 *.pem
 .credentials*
 *.secret
+
+# build output
+dist/
+*.zip
