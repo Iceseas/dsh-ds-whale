@@ -10,7 +10,7 @@
 右下角常驻一只会说话的小鲸鱼：余额、官网口径的今日用量、每轮花掉多少钱、峰谷倒计时，全都用拟人语气告诉你。
 A tiny whale docked in the bottom-right corner: balance, today's official spend, per-turn cost, peak/off-peak countdown — all narrated in character.
 
-[![version](https://img.shields.io/badge/version-0.9.0-blue)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.9.3-blue)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![platform](https://img.shields.io/badge/platform-DSH%20Web%20UI-purple)](https://github.com/Iceseas)
 
