@@ -41,6 +41,11 @@ A tiny whale docked in the bottom-right corner: balance, today's official spend,
 <img src="assets/whale-panic.png" width="130" alt="panicking" />
 </div>
 
+<div align="center">
+<img src="assets/71359_757.png" width="500" alt="blushing" />
+<img src="assets/71425_542.png" width="500" alt="pouting" />
+</div>
+
 ## 🚀 安装 / Install
 
 前置：DSH 桌面端或 `dsh web`，Node ≥ 20。
