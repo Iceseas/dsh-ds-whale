@@ -42,8 +42,9 @@ A tiny whale docked in the bottom-right corner: balance, today's official spend,
 </div>
 
 <div align="center">
-<img src="assets/71359_757.png" width="500" alt="blushing" />
-<img src="assets/71425_542.png" width="500" alt="pouting" />
+<img src="assets/71359_757.png" width="300" alt="blushing" />
+<img src="assets/71425_542.png" width="300" alt="pouting" />
+<img src="assets/75234_564.png" width="300" alt="pouting" />
 </div>
 
 ## 🚀 安装 / Install
