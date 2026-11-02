@@ -1,8 +1,10 @@
 """把贴纸图去白底并导出插件用的头像资源。
 
-输入：附件里的原始 webp（白底贴纸）。
-输出：assets/whale.png（512px 透明底）、assets/whale-128.png（小球用）。
+输入：附件里的原始贴纸图（白底）。
+输出：<prefix>.png（512px 透明底）、<prefix>-128.png（小球用）、<prefix>-64.png。
 做法：从四边做泛洪，把与边界连通的近白像素变透明，贴纸内部的白围裙不会被吃掉。
+用法：python tools/make-avatar.py <原图> <输出目录> [名字前缀]，前缀默认 whale
+      （情绪图用 whale-angry / whale-blush / whale-panic / whale-greet / whale-think）
 """
 import sys
 from collections import deque
@@ -11,6 +13,7 @@ from PIL import Image
 
 SRC = sys.argv[1]
 OUT_DIR = sys.argv[2]
+PREFIX = sys.argv[3] if len(sys.argv) > 3 else "whale"
 
 img = Image.open(SRC).convert("RGBA")
 w, h = img.size
@@ -70,7 +73,11 @@ if box:
 import os
 
 os.makedirs(OUT_DIR, exist_ok=True)
-for size, name in ((512, "whale.png"), (128, "whale-128.png"), (64, "whale-64.png")):
+for size, name in (
+    (512, PREFIX + ".png"),
+    (128, PREFIX + "-128.png"),
+    (64, PREFIX + "-64.png"),
+):
     out = img.copy()
     out.thumbnail((size, size), Image.LANCZOS)
     path = os.path.join(OUT_DIR, name)

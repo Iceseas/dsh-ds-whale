@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "DeepSeek Whale Widget",
-    "description": "A resident whale at the bottom-right corner: DeepSeek balance and bonus, today's spend (balance-delta based) plus local estimate, per-turn cost at peak/idle pricing, peak countdown, low-balance and daily-budget alerts, and a usage log. All data stays on this machine."
+    "description": "A resident whale at the bottom-right corner: DeepSeek balance and bonus, official today's spend, per-turn cost narration, peak countdown, low-balance and daily-budget alerts, a usage log, a right-click menu (refresh / balance detail / today's weather / settings), a nickname greeting when DSH opens, and six hand-drawn expressions. All data stays on this machine."
   }
 }
