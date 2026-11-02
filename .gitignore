@@ -30,5 +30,7 @@ dist/
 *.zip
 
 # 维护者本地脚本：只在本机用，不随仓库发布
-scripts/
+# （release.mjs 是唯一的发版主流程，单独放行 —— 换机器/换人时不能丢）
+scripts/*
+!scripts/release.mjs
 docs/

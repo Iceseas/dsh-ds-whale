@@ -38,8 +38,17 @@ jobs:
           PRE="false"
           case "$TAG" in
             *-*) PRE="true" ;;
-            *) if [ "$MAJOR" = "0" ]; then PRE="true"; fi ;;
+            *)
+              if [ "$MAJOR" = "0" ]; then PRE="true"; fi
+              ;;
           esac
+          # 0.x 默认算预发布（GitHub 的 /releases/latest 不会指向预发布，仓库首页也不显示）。
+          # 想让某一版变成正式版：在 CHANGELOG 该版段落里写一行 [stable]，
+          # 或者发版时直接 node scripts/release.mjs patch --stable -m "..."
+          if sed -n "/^## $TAG/,/^## /p" CHANGELOG.md | grep -q '\[stable\]'; then
+            PRE="false"
+            echo "CHANGELOG 里标了 [stable]，按正式版发布"
+          fi
           echo "prerelease=$PRE" >> "$GITHUB_OUTPUT"
           echo "version=$TAG" >> "$GITHUB_OUTPUT"
 
@@ -74,7 +83,8 @@ jobs:
             echo
             echo "### 变更提交"
             echo
-            git log "$RANGE" --no-merges --pretty='- %s (%h)' | sed -n '1,40p'
+            # 发版提交本身没有信息量，别塞进 Release 说明里
+            git log "$RANGE" --no-merges --pretty='- %s (%h)' | grep -v 'chore(release):' | sed -n '1,40p' || true
             echo
             echo "### 安装"
             echo
@@ -85,10 +95,22 @@ jobs:
             echo "免 git 安装：下载下方 \`dsh-ds-whale-$VERSION.zip\`，把整份内容合并进 \`<DSH_HOME>/profiles/<profile>/node_modules/dsh-ds-whale/\`，重启 DSH 即可。"
           } > "$NOTES"
           cat "$NOTES"
-          PRE_FLAG=""
-          if [ "$PRERELEASE" = "true" ]; then PRE_FLAG="--prerelease"; fi
-          gh release create "v$VERSION" \
-            "dsh-ds-whale-$VERSION.zip" \
-            --title "v$VERSION" \
-            --notes-file "$NOTES" \
-            $PRE_FLAG
+          # 同一个 tag 重推会走到这里：Release 已经存在，create 会直接报错退出。
+          # 所以先探测，存在就 edit 状态（含正式版/预发布）+ upload --clobber 覆盖附件。
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION 已存在 → 更新标题、说明与附件"
+            if [ "$PRERELEASE" = "true" ]; then
+              gh release edit "v$VERSION" --title "v$VERSION" --notes-file "$NOTES" --prerelease
+            else
+              gh release edit "v$VERSION" --title "v$VERSION" --notes-file "$NOTES" --prerelease=false --latest
+            fi
+            gh release upload "v$VERSION" "dsh-ds-whale-$VERSION.zip" --clobber
+          else
+            PRE_FLAG=""
+            if [ "$PRERELEASE" = "true" ]; then PRE_FLAG="--prerelease"; fi
+            gh release create "v$VERSION" \
+              "dsh-ds-whale-$VERSION.zip" \
+              --title "v$VERSION" \
+              --notes-file "$NOTES" \
+              $PRE_FLAG
+          fi
