@@ -95,22 +95,34 @@ jobs:
             echo "免 git 安装：下载下方 \`dsh-ds-whale-$VERSION.zip\`，把整份内容合并进 \`<DSH_HOME>/profiles/<profile>/node_modules/dsh-ds-whale/\`，重启 DSH 即可。"
           } > "$NOTES"
           cat "$NOTES"
-          # 同一个 tag 重推会走到这里：Release 已经存在，create 会直接报错退出。
-          # 所以先探测，存在就 edit 状态（含正式版/预发布）+ upload --clobber 覆盖附件。
-          if gh release view "v$VERSION" >/dev/null 2>&1; then
-            echo "Release v$VERSION 已存在 → 更新标题、说明与附件"
-            if [ "$PRERELEASE" = "true" ]; then
-              gh release edit "v$VERSION" --title "v$VERSION" --notes-file "$NOTES" --prerelease
-            else
-              gh release edit "v$VERSION" --title "v$VERSION" --notes-file "$NOTES" --prerelease=false --latest
-            fi
+          # 同一个 tag 重推会走到这里，而且「删掉 tag 再重推」之后过去那个 Release 可能变成
+          # draft 甚至查不到——所以统一用 API 走：先按 tag_name 找 id，找到就 PATCH 覆盖状态与
+          # 说明、再 upload --clobber 换附件；找不到才 create。
+          # 不用 gh release edit --prerelease=false --latest：gh 认为这两个 flag 互斥会直接报错。
+          if [ "$PRERELEASE" = "true" ]; then
+            WANT_PRE="true"; WANT_LATEST="false"
+          else
+            WANT_PRE="false"; WANT_LATEST="true"
+          fi
+          REL_ID=$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+            --jq ".[] | select(.tag_name==\"v$VERSION\") | .id" | head -n1 || true)
+          if [ -n "$REL_ID" ]; then
+            echo "Release v$VERSION 已存在（id=$REL_ID）→ PATCH 更新"
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$REL_ID" \
+              -f name="v$VERSION" \
+              -F body=@"$NOTES" \
+              -F draft=false \
+              -F prerelease="$WANT_PRE" \
+              -F make_latest="$WANT_LATEST" > /dev/null
+            echo "状态已更新：prerelease=$WANT_PRE make_latest=$WANT_LATEST"
             gh release upload "v$VERSION" "dsh-ds-whale-$VERSION.zip" --clobber
           else
-            PRE_FLAG=""
-            if [ "$PRERELEASE" = "true" ]; then PRE_FLAG="--prerelease"; fi
-            gh release create "v$VERSION" \
-              "dsh-ds-whale-$VERSION.zip" \
-              --title "v$VERSION" \
-              --notes-file "$NOTES" \
-              $PRE_FLAG
+            echo "Release v$VERSION 不存在 → 新建（prerelease=$WANT_PRE）"
+            if [ "$WANT_PRE" = "true" ]; then
+              gh release create "v$VERSION" "dsh-ds-whale-$VERSION.zip" \
+                --title "v$VERSION" --notes-file "$NOTES" --prerelease
+            else
+              gh release create "v$VERSION" "dsh-ds-whale-$VERSION.zip" \
+                --title "v$VERSION" --notes-file "$NOTES" --latest
+            fi
           fi
