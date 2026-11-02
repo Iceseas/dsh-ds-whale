@@ -1,8 +1,8 @@
 {
   "name": "dsh-ds-whale",
-  "version": "0.9.3",
+  "version": "0.9.6",
   "private": true,
-  "description": "DeepSeek 余额 / 用量挂件（DSH 插件）：余额、官网口径今日用量、每轮消耗拟人播报、峰谷定价倒计时，四状态立绘。",
+  "description": "DeepSeek 余额 / 用量挂件（DSH 插件）：余额、官网口径今日用量、每轮消耗拟人播报、峰谷定价倒计时、右键天气与开机问候，六种状态立绘。",
   "type": "module",
   "main": "lib/index.js",
   "scripts": {
@@ -30,6 +30,10 @@
     "assets/whale-blush-128.png",
     "assets/whale-panic.png",
     "assets/whale-panic-128.png",
+    "assets/whale-greet.png",
+    "assets/whale-greet-128.png",
+    "assets/whale-think.png",
+    "assets/whale-think-128.png",
     "locale/zh.json",
     "locale/en.json",
     "cordis.patch.yml",
