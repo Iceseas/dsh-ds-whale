@@ -10,7 +10,7 @@
 右下角常驻一只会说话的小鲸鱼：余额、官网口径的今日用量、每轮花掉多少钱、峰谷倒计时，全都用拟人语气告诉你。
 A tiny whale docked in the bottom-right corner: balance, today's official spend, per-turn cost, peak/off-peak countdown — all narrated in character.
 
-[![version](https://img.shields.io/badge/version-0.9.5-blue)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.9.6-blue)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![platform](https://img.shields.io/badge/platform-DSH%20Web%20UI-purple)](https://github.com/Iceseas)
 
@@ -36,7 +36,7 @@ A tiny whale docked in the bottom-right corner: balance, today's official spend,
 | 🚨 | **余额 / 预算告警** | 低于预警线或超出今日预算时换慌张脸，拟人播报 + 「去充值」/「看用量」+「知道啦」双按钮 |
 | 📒 | **用量记录** | 今日 / 近 7 天 / 全部、模型占比、按模型名或日期搜索；可清空今日、清空全部、重置基线 |
 | ⚙️ | **设置页** | 在 **DSH 设置 → 左侧导航** 里有独立一页「小鲸鱼 / Whale」（就在「喵记忆」下方）；同时也在 **DSH 设置 → 插件 → dsh-ds-whale** 由宿主按 schema 自动生成表单。右键菜单里的「打开小鲸鱼设置」会直接跳到这一页 |
-| 🖱️ | **手感** | 拖拽移动 + 位置记忆、以**页面中线**判定左右吸附、大小滑块 |
+| 🖱️ | **手感** | 拖拽移动 + 位置记忆、以**页面中线**判定左右吸附、大小滑块；鲸鱼可以拖到窗口最上面，此时播报气泡与详情面板会自动翻到下方（按实测高度判断），常驻小气泡垂直居中跟随，都不会被窗口边缘裁掉 |
 
 <div align="center">
 <img src="assets/whale-blush.png" width="110" alt="blushing" />
