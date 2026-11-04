@@ -29,7 +29,7 @@ A tiny whale docked in the bottom-right corner: balance, today's official spend,
 | 🗣️ | **拟人播报** | 每轮对话结束，用小鲸鱼的口吻把本轮花了多少钱说出来（按金额分 5 档台词），副行给模型与入/出 token；**必须点「知道啦~」才关闭**，不会自己消失 |
 | 🎭 | **六种状态立绘** | 平静 / 气鼓鼓（点击受击）/ 脸红（说话中）/ 慌张（余额告警）/ **挥手打招呼（开机问候）** / **托腮思考（在看天气）** |
 | 🖱️ | **左键刷新 · 右键菜单** | 右键（不触发受击抖动）弹出菜单：立即刷新余额 / 查看余额详情 / 今日天气 / 打开小鲸鱼设置；菜单项有明显的悬停高亮与过渡动画 |
-| 🌤️ | **今日天气** | 右键菜单里的「今日天气」：宿主直连 Open-Meteo，**零 token**；给当前温度、今日区间、降雨概率、接下来三小时的走向，外加一句该带伞还是该补水。第一次用会先请你在设置里填城市 |
+| 🌤️ | **今日天气** | 右键菜单里的「今日天气」：**零 token**；给当前温度、今日区间、降雨概率、接下来三小时的走向，外加一句该带伞还是该补水。第一次用会先请你在设置里填城市（不猜 IP）；城市名换经纬度有三路兜底（内置常用城市表 → photon → Open-Meteo），失败时区分「城市没找到」和「网络连不上」 |
 | 👋 | **开机问候** | 每次打开 DSH，按你设定的昵称用同一套可爱语气问好（按时段分六档台词），配挥手立绘与提示音 |
 | 💬 | **常驻气泡** | 头像旁常驻一个纵向小气泡，显示你勾选的 1–3 个参数（余额 / 今日已用 / 本机估算 / 本轮消耗 / 峰谷倒计时） |
 | ⏰ | **峰谷定价** | 工作日 9:00–12:00、14:00–18:00 为高峰，空闲价是高峰价一半；周末全天谷价，面板上有实时倒计时 |
@@ -93,7 +93,7 @@ git clone https://github.com/Iceseas/dsh-ds-whale.git
 - 外部请求只有三条，都用你本机已有的凭据（第三条不带任何凭据）：
   1. `GET https://api.deepseek.com/user/balance`（Bearer `DEEPSEEK_API_KEY`）
   2. 官网用量 `GET https://platform.deepseek.com/api/v0/usage/by_api_key/{amount,cost}`（带 DSH 登录态的 `x-dsh-auth-token`）
-  3. 天气（仅当你点「今日天气」时）：`geocoding-api.open-meteo.com` 把你的城市名换成经纬度，`api.open-meteo.com` 取预报。**不带凭据、不带 token、不带你填的城市以外的任何信息**，结果在宿主进程内缓存 10 分钟
+  3. 天气（仅当你点「今日天气」时）：先把城市名换成经纬度，再取预报。**不带凭据、不带 token、不带你填的城市以外的任何信息**，结果在宿主进程内缓存 10 分钟。换经纬度是「三路兜底」：内置常用城市坐标表（命中就完全不联网）→ `photon.komoot.io` → `geocoding-api.open-meteo.com`；取预报只走 `api.open-meteo.com`
 - 代码里没有任何硬编码密钥；仓库不含 `.env` / 凭据 / 个人路径。
 - 记录页底部「清空今日 / 清空全部 / 重置基线」可随时抹掉账本。
 
@@ -140,7 +140,7 @@ DeepSeek 的 usage 里 `totalTokens = inputTokens + outputTokens + cacheReadToke
 | --- | --- |
 | `/state` | 余额 + 今日（含官网用量）+ 峰谷 + 设置 + 最近记录（自动补刷过期数据） |
 | `/refresh` | 强制刷新余额与官网用量 |
-| `/weather` | 今日天气（`{force?, city?}`）：走 Open-Meteo，零 token；设置里没城市时返回 `{ok:false, error:"need-city"}` |
+| `/weather` | 今日天气（`{force?, city?}`）：零 token；设置里没城市时返回 `{ok:false, error:"need-city"}`，查不到城市是 `geocode-failed`，联网失败是 `geocode-offline`（两种提示语不同） |
 | `/settings` | 写设置：`{"patch":{...}}` 改运行时，`{"config":{...}}` 写进 profile 的 `cordis.patch.yml` |
 | `/ledger` | `clear-today` / `clear-all` / `ack-adjust` / `rebaseline` |
 | `/history` | 按模型名或日期检索历史 |
