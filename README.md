@@ -10,7 +10,7 @@
 右下角常驻一只会说话的小鲸鱼：余额、官网口径的今日用量、每轮花掉多少钱、峰谷倒计时，全都用拟人语气告诉你。
 A tiny whale docked in the bottom-right corner: balance, today's official spend, per-turn cost, peak/off-peak countdown — all narrated in character.
 
-[![version](https://img.shields.io/badge/version-0.9.8-blue)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.9.9-blue)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![platform](https://img.shields.io/badge/platform-DSH%20Web%20UI-purple)](https://github.com/Iceseas)
 
@@ -29,7 +29,7 @@ A tiny whale docked in the bottom-right corner: balance, today's official spend,
 | 🗣️ | **拟人播报** | 每轮对话结束，用小鲸鱼的口吻把本轮花了多少钱说出来（按金额分 5 档台词），副行给模型与入/出 token；**必须点「知道啦~」才关闭**，不会自己消失 |
 | 🎭 | **六种状态立绘** | 平静 / 气鼓鼓（点击受击）/ 脸红（说话中）/ 慌张（余额告警）/ **挥手打招呼（开机问候）** / **托腮思考（在看天气）** |
 | 🖱️ | **左键刷新 · 右键菜单** | 右键（不触发受击抖动）弹出菜单：立即刷新余额 / 查看余额详情 / 去充值 / 今日天气 / 打开小鲸鱼设置；「去充值」一键开官网充值页（优先用 DSH 账号服务给的 `topUpUrl`，取不到就落到 `platform.deepseek.com/top_up`），不用先开面板再点气泡链接；菜单项有明显的悬停高亮与过渡动画 |
-| 🌤️ | **今日天气** | 右键菜单里的「今日天气」：**零 token**；给当前温度、今日区间、降雨概率、接下来三小时的走向，外加一句该带伞还是该补水。第一次用会先请你在设置里填城市（不猜 IP）；城市名换经纬度有三路兜底（内置常用城市表 → photon → Open-Meteo），失败时区分「城市没找到」和「网络连不上」 |
+| 🌤️ | **今日天气** | 右键菜单里的「今日天气」：**零 token**；给当前温度、今日区间、降雨概率、接下来三小时的走向，外加一句该带伞还是该补水。第一次用**直接在气泡里填城市**（输入框就在鲸鱼旁边，存好立刻出天气，不用去设置页翻）；城市名换经纬度有三路兜底（内置常用城市表 → photon → Open-Meteo），失败时区分「城市没找到」和「网络连不上」 |
 | 👋 | **开机问候** | 每次打开 DSH，按你设定的昵称用同一套可爱语气问好（按时段分六档台词），配挥手立绘与提示音 |
 | 💬 | **常驻气泡** | 头像旁常驻一个纵向小气泡，顶上一条**峰谷状态带**（圆点 + 高峰/空闲 + 全价/5 折 + 距下次切换的倒计时），下面是你勾选的 1–3 个参数（余额 / 今日已用 / 本机估算 / 本轮消耗 / 峰谷倒计时） |
 | ⏰ | **峰谷定价** | 工作日 9:00–12:00、14:00–18:00 为高峰（全价），其余时段与周末空闲（5 折）：常驻气泡有状态带，详情面板有 **24 小时价档条** 与此刻游标、当前窗口、下一段的时段名，周末倒计时按「天:时」显示 |
@@ -52,7 +52,7 @@ A tiny whale docked in the bottom-right corner: balance, today's official spend,
 | --- | --- | --- |
 | 打开 DSH | 挥手打招呼 | 「小蓝，早上好呀！余额我盯好了，随时可以开工。」 |
 | 点「今日天气」 | 托腮思考 | 「北京 · 7°C 晴」/ 今天 4~16°C · 大致晴朗 · 降雨 0% |
-| 还没填城市就点天气 | 托腮思考 | 「先告诉我在哪座城市嘛～」→ 按钮「去填城市」直达设置页 |
+| 还没填城市就点天气 | 托腮思考 | 「先告诉我在哪座城市嘛～」→ 气泡里直接出现输入框，填完按「保存并看天气」立刻出结果 |
 
 <div align="center">
 <img src="assets/71359_757.png" width="300" alt="blushing" />
@@ -86,6 +86,28 @@ git clone https://github.com/Iceseas/dsh-ds-whale.git
 
 **安装即用的前提**：DSH 里已经配好 DeepSeek 凭据（`DEEPSEEK_API_KEY`）**或**已经登录 DeepSeek 账号。两者都没有时挂件仍会出现，只是余额一栏会提示需要凭据。
 
+## ⬆️ 更新 / Update
+
+看当前版本：小鲸鱼面板 → 设置，最底部那行有 `版本 vX.Y.Z` 和「查看新版」（直通 Releases 列表）。最新版看 [Releases](https://github.com/Iceseas/dsh-ds-whale/releases)（0.x 阶段都按 Pre-release 发，仓库首页的 Releases 卡片不显示，`/releases/latest` 也不指向它——**这只影响展示，不影响安装和更新**）。
+
+**装的时候没写版本号**（`github:Iceseas/dsh-ds-whale`）——跟默认分支最新，一条命令：
+
+```bash
+dsh plugin update dsh-ds-whale
+```
+
+**装的时候锁了 tag**（`.../dsh-ds-whale#v0.9.8`）——`update` 不会跨版本，要显式换 tag：
+
+```bash
+dsh plugin add github:Iceseas/dsh-ds-whale#v0.9.9
+```
+
+**手工 zip / 手放目录安装的**：下载新的 `dsh-ds-whale-x.y.z.zip`，整份覆盖 `<DSH_PROFILE_DIR>/node_modules/dsh-ds-whale/`，再重启。
+
+更新完都要**重启 DSH**——插件有宿主侧代码（`lib/index.js` 的路由与状态），热重载只换前端。
+
+> 多 profile 的环境（`desktop` / `web` 并存）记得带 `--profile`，例如 `dsh plugin update dsh-ds-whale --profile web`。
+
 ## 🔐 数据与隐私 / Privacy
 
 - 唯一数据文件：`$DSH_HOME/.dsh-ds-whale.json`（Windows 默认 `C:\Users\<你>\.dsh\.dsh-ds-whale.json`），**只存在本机**。
@@ -114,7 +136,7 @@ git clone https://github.com/Iceseas/dsh-ds-whale.git
 | 峰谷时段 `showPeak` | 常驻气泡顶上是否显示时段状态带（高峰/空闲、全价/5 折、切换倒计时）；关掉后气泡只剩你选的数字 |
 | 点击刷新间隔 `clickCooldownMs` | 左键点鲸鱼刷新的最小间隔（2000–120000ms，默认 6000），防止连点打爆余额接口 |
 | 开机打招呼 `greetOnStart` | 每次打开 DSH 是否按昵称问好 |
-| 天气城市 `weatherCity` | 天气用的城市名（例如 `上海` / `Tokyo`）。**必填**：没填时点「今日天气」会先请你去填，填好存下后再点一次即可 |
+| 天气城市 `weatherCity` | 天气用的城市名（例如 `上海` / `Tokyo`）。**必填**：没填时点「今日天气」会直接在气泡里问，填完立刻出天气；设置页里这一栏也支持边打边存（800ms 防抖，不依赖失焦） |
 | 缓存口径 `cacheInInput` | `inputTokens` 是否已含缓存命中，DeepSeek 不含，保持关闭 |
 
 ## 🧮 定价与算法 / Pricing
