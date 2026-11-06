@@ -1,6 +1,6 @@
 {
   "name": "dsh-ds-whale",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "private": true,
   "description": "DeepSeek 余额 / 用量挂件（DSH 插件）：余额、官网口径今日用量、每轮消耗拟人播报、峰谷定价倒计时、右键天气与开机问候，六种状态立绘。",
   "type": "module",
