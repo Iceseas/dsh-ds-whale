@@ -43,11 +43,12 @@ jobs:
               ;;
           esac
           # 0.x 默认算预发布（GitHub 的 /releases/latest 不会指向预发布，仓库首页也不显示）。
-          # 想让某一版变成正式版：在 CHANGELOG 该版段落里写一行 [stable]，
-          # 或者发版时直接 node scripts/release.mjs patch --stable -m "..."
-          if sed -n "/^## $TAG/,/^## /p" CHANGELOG.md | grep -q '\[stable\]'; then
+          # 想让某一版变成正式版：发版时直接 node scripts/release.mjs patch --stable -m "..."
+          # 它会在 CHANGELOG 该版段落末尾写一行 HTML 注释 <!-- dsh-release: stable -->，
+          # 渲染不可见、只在源码里给这个 workflow 认。（旧版写的是 [stable]，这里兼容老 tag。）
+          if sed -n "/^## $TAG/,/^## /p" CHANGELOG.md | grep -qE '\[stable\]|dsh-release:[[:space:]]*stable'; then
             PRE="false"
-            echo "CHANGELOG 里标了 [stable]，按正式版发布"
+            echo "CHANGELOG 里标了正式版标记，按正式版发布"
           fi
           echo "prerelease=$PRE" >> "$GITHUB_OUTPUT"
           echo "version=$TAG" >> "$GITHUB_OUTPUT"
@@ -72,19 +73,15 @@ jobs:
           PRERELEASE: ${{ steps.ver.outputs.prerelease }}
         run: |
           set -euo pipefail
-          PREV=$(git tag --sort=-v:refname | grep -v "^v$VERSION$" | head -n1 || true)
-          if [ -n "$PREV" ]; then RANGE="$PREV..v$VERSION"; else RANGE="v$VERSION"; fi
           NOTES="notes.md"
           {
             echo "## v$VERSION"
             echo
-            # CHANGELOG 里本版那一段（到下一个二级标题为止）
-            sed -n "/^## $VERSION/,/^## /p" CHANGELOG.md | sed '$d'
-            echo
-            echo "### 变更提交"
-            echo
-            # 发版提交本身没有信息量，别塞进 Release 说明里
-            git log "$RANGE" --no-merges --pretty='- %s (%h)' | grep -v 'chore(release):' | sed -n '1,40p' || true
+            # 正文只放 CHANGELOG 里本版那一段（到下一个二级标题为止）。
+            # 1d 去掉段落首行 "## x.y.z — 日期"（标题已经由上面 echo 过了，免得出现两个版本号标题）；
+            # 不附「变更提交」列表：内部提交（ci / chore / 发版流程细节）是给自己看的，
+            # 对外只留手写的功能说明；正式版标记是 HTML 注释，也一并过滤掉。
+            sed -n "/^## $VERSION/,/^## /p" CHANGELOG.md | sed '$d;1d' | grep -v 'dsh-release:' || true
             echo
             echo "### 安装"
             echo
