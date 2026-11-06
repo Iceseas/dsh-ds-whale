@@ -10,7 +10,7 @@
 右下角常驻一只会说话的小鲸鱼：余额、官网口径的今日用量、每轮花掉多少钱、峰谷倒计时，全都用拟人语气告诉你。
 A tiny whale docked in the bottom-right corner: balance, today's official spend, per-turn cost, peak/off-peak countdown — all narrated in character.
 
-[![version](https://img.shields.io/badge/version-0.9.9-blue)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.9.10-blue)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![platform](https://img.shields.io/badge/platform-DSH%20Web%20UI-purple)](https://github.com/Iceseas)
 
@@ -36,7 +36,7 @@ A tiny whale docked in the bottom-right corner: balance, today's official spend,
 | 🚨 | **余额 / 预算告警** | 低于预警线或超出今日预算时换慌张脸，拟人播报 + 「去充值」/「看用量」+「知道啦」双按钮 |
 | 📒 | **用量记录** | 今日 / 近 7 天 / 全部、模型占比、按模型名或日期搜索；可清空今日、清空全部、重置基线 |
 | ⚙️ | **设置页** | 在 **DSH 设置 → 左侧导航** 里有独立一页「小鲸鱼 / Whale」（就在「喵记忆」下方）；同时也在 **DSH 设置 → 插件 → dsh-ds-whale** 由宿主按 schema 自动生成表单。右键菜单里的「打开小鲸鱼设置」会直接跳到这一页 |
-| 🖱️ | **手感** | 拖拽移动 + 位置记忆、以**页面中线**判定左右吸附、大小滑块；鲸鱼可以拖到窗口最上面，此时播报气泡与详情面板会自动翻到下方（按实测高度判断），常驻小气泡垂直居中跟随，都不会被窗口边缘裁掉 |
+| 🖱️ | **手感** | 拖拽移动 + 位置记忆（存「贴哪一边 + 距那条边多远」，窗口拉大拉小都跟边不跟距离走）、以**页面中线**判定左右吸附、大小滑块；鲸鱼可以拖到窗口最上面，此时播报气泡与详情面板会自动翻到下方（按实测高度判断），常驻小气泡垂直居中跟随，都不会被窗口边缘裁掉 |
 
 <div align="center">
 <img src="assets/whale-blush.png" width="110" alt="blushing" />
@@ -55,9 +55,11 @@ A tiny whale docked in the bottom-right corner: balance, today's official spend,
 | 还没填城市就点天气 | 托腮思考 | 「先告诉我在哪座城市嘛～」→ 气泡里直接出现输入框，填完按「保存并看天气」立刻出结果 |
 
 <div align="center">
-<img src="assets/71359_757.png" width="300" alt="blushing" />
-<img src="assets/75234_564.png" width="300" alt="pouting" />
-<img src="assets/71425_542.png" width="300" alt="pouting" />
+<img src="assets/shot-dock.png" width="300" alt="常驻气泡：峰谷状态带 + 三项参数" />
+<img src="assets/shot-dock-cooldown.png" width="300" alt="点击后的冷却提示" />
+<br />
+<img src="assets/shot-greet.png" width="286" alt="开机问候：挥手立绘 + 拟人播报" />
+<img src="assets/shot-summary.png" width="286" alt="本轮小结：用了多少钱、值不值" />
 </div>
 
 ## 🚀 安装 / Install
@@ -99,7 +101,7 @@ dsh plugin update dsh-ds-whale
 **装的时候锁了 tag**（`.../dsh-ds-whale#v0.9.8`）——`update` 不会跨版本，要显式换 tag：
 
 ```bash
-dsh plugin add github:Iceseas/dsh-ds-whale#v0.9.9
+dsh plugin add github:Iceseas/dsh-ds-whale#v0.9.10
 ```
 
 **手工 zip / 手放目录安装的**：下载新的 `dsh-ds-whale-x.y.z.zip`，整份覆盖 `<DSH_PROFILE_DIR>/node_modules/dsh-ds-whale/`，再重启。
@@ -177,14 +179,17 @@ dsh-ds-whale/
 ├── lib/client.js     # Client 半：挂件 UI、情绪动画、播报、设置页组件
 ├── assets/           # 六种状态立绘 + 小尺寸
 ├── locale/           # meta.title / meta.description
-├── tools/make-avatar.py  # 把贴纸原图去白底并裁切导出（第三个参数是名字前缀）
+├── scripts/gen-avatars.mjs  # 调本机 Agnes 批量生成立绘（六种 mood）
+├── scripts/cut-bg.ps1       # 白底转透明（四边泛洪 + 边缘羽化）
+├── scripts/build-avatar.ps1 # 裁 bbox + 缩 512/128/64
+├── scripts/finalize-avatars.ps1 # 串起上面两步
 ├── cordis.patch.yml  # 插件行声明
 └── package.json
 ```
 
 - 改 `lib/client.js`：DSH 的 client-hmr 会热重载（必要时 Ctrl+Shift+R 硬刷新一次，避免旧模块实例叠在新实例下面）。
 - 改 `lib/index.js`：需要重载 Host 半（插件管理器里关/开一次该插件）。
-- 立绘：把原图丢给 `tools/make-avatar.py <原图> <输出目录> [名字前缀]`，会做边缘泛洪去白底 + 裁 bbox + 导出 512/128/64，然后覆盖 `assets/`。情绪图的前缀用 `whale-angry` / `whale-blush` / `whale-panic` / `whale-greet` / `whale-think`，宿主按 `MOOD_FILES` 里的文件名直接发图（`mood=greet` / `mood=think`）。
+- 立绘：`node scripts/gen-avatars.mjs`（需要 DSH 在跑 + 已装 `dsh-agnes-studio` 且配好 `AGNES_API_KEY`）会按 `CHARACTER` + `POSES` 生成六张到 `avatar-out/`；再 `& scripts\finalize-avatars.ps1 -SrcDir avatar-out -OutDir avatar-out\final -Pad 0.02` 做去白底、裁 bbox、导出 512/128/64；最后覆盖 `assets/`。文件前缀固定为 `whale` / `whale-angry` / `whale-blush` / `whale-panic` / `whale-greet` / `whale-think`，宿主按 `MOOD_FILES` 直接发图（`mood=greet` / `mood=think`）。想换成自己的图，放到 `~/.dsh/dsh-ds-whale-assets/` 同名覆盖即可，不用改仓库。
 
 ## 📄 License
 
