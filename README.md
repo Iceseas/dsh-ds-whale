@@ -5,10 +5,8 @@
 # 🐳 dsh-ds-whale
 
 **DeepSeek 余额 / 用量小鲸鱼挂件** · DSH Web UI 插件
-**Whale balance & usage widget for DeepSeek — a DSH Web UI plugin**
 
-右下角常驻一只会说话的小鲸鱼：余额、官网口径的今日用量、每轮花掉多少钱、峰谷倒计时，全都用拟人语气告诉你。
-A tiny whale docked in the bottom-right corner: balance, today's official spend, per-turn cost, peak/off-peak countdown — all narrated in character.
+**简体中文** · [English](README.en.md)
 
 [![version](https://img.shields.io/badge/version-0.9.11-blue)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -18,9 +16,11 @@ A tiny whale docked in the bottom-right corner: balance, today's official spend,
 
 ---
 
-> **English TL;DR** — Install the bundle into your DSH profile, reload, and a whale appears in the bottom-right corner. She greets you by nickname on startup, refreshes on left click (rate-limited), opens a right-click menu (refresh / balance detail / today's weather / settings), reads your balance from the DSH credential `DEEPSEEK_API_KEY` (or your DSH DeepSeek sign-in), pulls **today's real spend from the official usage API** (the same numbers as `platform.deepseek.com/usage`), narrates every turn's cost in a cute voice, and switches between six hand-drawn expressions. Weather is fetched straight from Open-Meteo by the host process — **zero tokens**, never through a model. Everything is stored locally in `$DSH_HOME/.dsh-ds-whale.json`. UI is available in **中文 / English**, auto-selected from your system locale.
+右下角常驻一只会说话的小鲸鱼：余额、官网口径的今日用量、每轮花掉多少钱、峰谷倒计时，全都用拟人语气告诉你。
 
-## ✨ 它做什么 / What it does
+装进 DSH profile、重启一次，它就会出现在右下角：开机按昵称打招呼；左键点一下立刻刷新余额（默认 6s 冷却）；右键菜单能看余额详情、今日天气、打开设置；余额读 DSH 凭据 `DEEPSEEK_API_KEY`（或 DSH 里的 DeepSeek 登录态）；今日花费直接取官网用量接口，和 `platform.deepseek.com/usage` **同源同数字**；每轮结束用可爱语气播报这轮花了多少；六张手绘立绘随场景切换。天气由宿主进程直连 Open-Meteo，**零 token**，永远不经过模型。所有数据只存在本机 `$DSH_HOME/.dsh-ds-whale.json`。界面支持**中文 / English**，默认跟随系统语言。
+
+## ✨ 它做什么
 
 | | 能力 | 说明 |
 | --- | --- | --- |
@@ -39,14 +39,14 @@ A tiny whale docked in the bottom-right corner: balance, today's official spend,
 | 🖱️ | **手感** | 拖拽移动 + 位置记忆（存「贴哪一边 + 距那条边多远」，窗口拉大拉小都跟边不跟距离走）、以**页面中线**判定左右吸附、大小滑块；鲸鱼可以拖到窗口最上面，此时播报气泡与详情面板会自动翻到下方（按实测高度判断），常驻小气泡垂直居中跟随，都不会被窗口边缘裁掉 |
 
 <div align="center">
-<img src="assets/whale-blush.png" width="110" alt="blushing" />
-<img src="assets/whale-angry.png" width="110" alt="pouting" />
-<img src="assets/whale-panic.png" width="110" alt="panicking" />
-<img src="assets/whale-greet.png" width="110" alt="waving hello" />
-<img src="assets/whale-think.png" width="110" alt="thinking" />
+<img src="assets/whale-blush.png" width="110" alt="脸红" />
+<img src="assets/whale-angry.png" width="110" alt="气鼓鼓" />
+<img src="assets/whale-panic.png" width="110" alt="慌张" />
+<img src="assets/whale-greet.png" width="110" alt="挥手打招呼" />
+<img src="assets/whale-think.png" width="110" alt="托腮思考" />
 </div>
 
-## 👋 三种新动作 / New gestures
+## 👋 三种新动作
 
 | 什么时候 | 立绘 | 台词（节选） |
 | --- | --- | --- |
@@ -62,7 +62,7 @@ A tiny whale docked in the bottom-right corner: balance, today's official spend,
 <img src="assets/shot-summary.png" width="286" alt="本轮小结：用了多少钱、值不值" />
 </div>
 
-## 🚀 安装 / Install
+## 🚀 安装
 
 前置：DSH 桌面端或 `dsh web`，Node ≥ 20。
 
@@ -88,7 +88,7 @@ git clone https://github.com/Iceseas/dsh-ds-whale.git
 
 **安装即用的前提**：DSH 里已经配好 DeepSeek 凭据（`DEEPSEEK_API_KEY`）**或**已经登录 DeepSeek 账号。两者都没有时挂件仍会出现，只是余额一栏会提示需要凭据。
 
-## ⬆️ 更新 / Update
+## ⬆️ 更新
 
 看当前版本：小鲸鱼面板 → 设置，最底部那行有 `版本 vX.Y.Z` 和「查看新版」（直通 Releases 列表）。最新版看 [Releases](https://github.com/Iceseas/dsh-ds-whale/releases)（0.x 阶段都按 Pre-release 发，仓库首页的 Releases 卡片不显示，`/releases/latest` 也不指向它——**这只影响展示，不影响安装和更新**）。
 
@@ -101,7 +101,8 @@ dsh plugin update dsh-ds-whale
 **装的时候锁了 tag**（`.../dsh-ds-whale#v0.9.8`）——`update` 不会跨版本，要显式换 tag：
 
 ```bash
-dsh plugin add github:Iceseas/dsh-ds-whale#v0.9.10
+# 把 vX.Y.Z 换成目标版本的 tag（在 Releases 里挑最新那个）
+dsh plugin add github:Iceseas/dsh-ds-whale#vX.Y.Z
 ```
 
 **手工 zip / 手放目录安装的**：下载新的 `dsh-ds-whale-x.y.z.zip`，整份覆盖 `<DSH_PROFILE_DIR>/node_modules/dsh-ds-whale/`，再重启。
@@ -110,7 +111,7 @@ dsh plugin add github:Iceseas/dsh-ds-whale#v0.9.10
 
 > 多 profile 的环境（`desktop` / `web` 并存）记得带 `--profile`，例如 `dsh plugin update dsh-ds-whale --profile web`。
 
-## 🔐 数据与隐私 / Privacy
+## 🔐 数据与隐私
 
 - 唯一数据文件：`$DSH_HOME/.dsh-ds-whale.json`（Windows 默认 `C:\Users\<你>\.dsh\.dsh-ds-whale.json`），**只存在本机**。
 - 只保存：余额观测、官网用量缓存、每日汇总、每轮金额。**不保存任何对话内容**，不上传任何数据。
@@ -121,7 +122,7 @@ dsh plugin add github:Iceseas/dsh-ds-whale#v0.9.10
 - 代码里没有任何硬编码密钥；仓库不含 `.env` / 凭据 / 个人路径。
 - 记录页底部「清空今日 / 清空全部 / 重置基线」可随时抹掉账本。
 
-## ⚙️ 设置项 / Settings
+## ⚙️ 设置项
 
 | 字段 | 说明 |
 | --- | --- |
@@ -141,7 +142,7 @@ dsh plugin add github:Iceseas/dsh-ds-whale#v0.9.10
 | 天气城市 `weatherCity` | 天气用的城市名（例如 `上海` / `Tokyo`）。**必填**：没填时点「今日天气」会直接在气泡里问，填完立刻出天气；设置页里这一栏也支持边打边存（800ms 防抖，不依赖失焦） |
 | 缓存口径 `cacheInInput` | `inputTokens` 是否已含缓存命中，DeepSeek 不含，保持关闭 |
 
-## 🧮 定价与算法 / Pricing
+## 🧮 定价与算法
 
 元 / 百万 tokens，格式 `[空闲, 高峰]`：
 
@@ -156,7 +157,7 @@ DeepSeek 的 usage 里 `totalTokens = inputTokens + outputTokens + cacheReadToke
 
 **三种口径的关系**：官网用量（权威，主数字）→ 余额差观测（旁证）→ 本机 token 估算（对照）。面板把三者的差写成「偏差」，用来发现价格表漂移。
 
-## 🧩 路由 / Routes
+## 🧩 路由
 
 前缀 `/api/dsh-ds-whale`，同源 `POST`（仅本机浏览器可用）：
 
@@ -171,7 +172,7 @@ DeepSeek 的 usage 里 `totalTokens = inputTokens + outputTokens + cacheReadToke
 | `/client-hello` | 前端自检回报（build / 当前情绪），用于排查 |
 | `GET /avatar.png` | 形象 PNG，支持 `?size=128`、`&mood=angry\|blush\|panic\|greet\|think`，带 ETag |
 
-## 🛠️ 开发 / Development
+## 🛠️ 开发
 
 ```
 dsh-ds-whale/
