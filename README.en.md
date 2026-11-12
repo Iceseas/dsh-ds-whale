@@ -30,6 +30,7 @@ Install it into your DSH profile, reload once, and she shows up in the bottom-ri
 | 🎭 | **Six expressions** | calm / pouting (on click) / blushing (while talking) / panicking (balance warning) / **waving hello (startup greeting)** / **chin on hand (weather)** |
 | 🖱️ | **Left click refresh · right-click menu** | Right click (no hit shake) opens: refresh now / balance details / top up / today's weather / open whale settings. "Top up" opens the official top-up page in one click (prefers the `topUpUrl` from DSH's account service, falls back to `platform.deepseek.com/top_up`) — no need to open a panel first. Menu items have proper hover highlight and transitions |
 | 🌤️ | **Today's weather** | "Today's weather" in the right-click menu: **zero tokens**. Current temperature, today's range, rain probability, the next three hours, plus a line on whether to grab an umbrella or hydrate. First use lets you **type the city right in the bubble** (the input sits next to the whale; save and the weather shows up immediately, no trip to the settings page). City → lat/lon has three fallbacks (built-in city table → photon → Open-Meteo), and it distinguishes "city not found" from "network unreachable" |
+| 🔊 | **Custom sounds** | Four independent scenes: **greeting** (when DSH opens) / **per-turn narration** / **click** / **balance & budget alert**. Each row has its own on/off, preview, and upload (wav / mp3 / ogg / m4a / flac, ≤ 500 KB each). A successful upload swaps the sound instantly and previews it; "reset to default" goes back to the synthesized chime. Without an upload the four default chimes differ in pitch and rhythm (short click, rising greeting, two-note falling alert), so you can tell events apart without looking. Rapid clicks on the same scene replay every time (each play is a fresh source) — it never goes "sound once, silent after" |
 | 👋 | **Startup greeting** | Every time DSH opens she greets you by your nickname in the same cute voice (six tiers by time of day), with the waving pose and a chime |
 | 💬 | **Persistent bubble** | A small vertical bubble next to the avatar: a **peak/off-peak status strip** on top (dot + peak/idle + full price/50% off + countdown to the next switch), and the 1–3 metrics you picked below (balance / today / local estimate / this turn / peak countdown) |
 | ⏰ | **Peak pricing** | Weekdays 09:00–12:00 and 14:00–18:00 are peak (full price); all other hours and weekends are idle (50% off). The bubble has the status strip, the details panel has a **24-hour price band** with a now-cursor, the current window and the next window's name; weekend countdowns are shown as "d:h" |
@@ -171,6 +172,9 @@ Prefix `/api/dsh-ds-whale`, same-origin `POST` (reachable only from the local br
 | `/history` | Search history by model name or date |
 | `/client-hello` | Front-end self-report (build / current mood) for troubleshooting |
 | `GET /avatar.png` | Avatar PNG; supports `?size=128` and `&mood=angry\|blush\|panic\|greet\|think`; ETag enabled |
+| `GET /sound` | Custom sound file: `?scene=greet\|turn\|click\|warn`; ETag enabled (rev changes when the file changes, so the browser refetches) |
+| `/sound/upload` | Upload a sound: `{scene, name, mime, data(base64)}`, ≤ 500 KB; the response carries the new `sounds` metadata |
+| `/sound/reset` | Drop a scene's custom sound and go back to the default chime: `{scene}` |
 
 ## 🛠️ Development
 
@@ -190,6 +194,7 @@ dsh-ds-whale/
 
 - Editing `lib/client.js`: DSH's client-hmr hot-reloads it (do one Ctrl+Shift+R hard refresh if needed, so an old module instance doesn't sit under the new one).
 - Editing `lib/index.js`: reload the host half (toggle the plugin off/on in the plugin manager).
+- Sound files live in `$DSH_HOME/dsh-ds-whale-sounds/<scene>` (`greet` / `turn` / `click` / `warn`); metadata travels with `.dsh-ds-whale.json`. Dropping same-named files in that directory (or deleting them) is reconciled from disk on the next start.
 - Poses: `node scripts/gen-avatars.mjs` (requires DSH running + `dsh-agnes-studio` installed with `AGNES_API_KEY` configured) generates six images into `avatar-out/` from `CHARACTER` + `POSES`; then `& scripts\finalize-avatars.ps1 -SrcDir avatar-out -OutDir avatar-out\final -Pad 0.02` removes the white background, trims to the bbox and exports 512/128/64; finally overwrite `assets/`. File prefixes are fixed as `whale` / `whale-angry` / `whale-blush` / `whale-panic` / `whale-greet` / `whale-think`; the host serves them straight from `MOOD_FILES` (`mood=greet` / `mood=think`). To use your own art, drop same-named files into `~/.dsh/dsh-ds-whale-assets/` — no repo changes needed.
 
 ## 📄 License

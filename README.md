@@ -30,6 +30,7 @@
 | 🎭 | **六种状态立绘** | 平静 / 气鼓鼓（点击受击）/ 脸红（说话中）/ 慌张（余额告警）/ **挥手打招呼（开机问候）** / **托腮思考（在看天气）** |
 | 🖱️ | **左键刷新 · 右键菜单** | 右键（不触发受击抖动）弹出菜单：立即刷新余额 / 查看余额详情 / 去充值 / 今日天气 / 打开小鲸鱼设置；「去充值」一键开官网充值页（优先用 DSH 账号服务给的 `topUpUrl`，取不到就落到 `platform.deepseek.com/top_up`），不用先开面板再点气泡链接；菜单项有明显的悬停高亮与过渡动画 |
 | 🌤️ | **今日天气** | 右键菜单里的「今日天气」：**零 token**；给当前温度、今日区间、降雨概率、接下来三小时的走向，外加一句该带伞还是该补水。第一次用**直接在气泡里填城市**（输入框就在鲸鱼旁边，存好立刻出天气，不用去设置页翻）；城市名换经纬度有三路兜底（内置常用城市表 → photon → Open-Meteo），失败时区分「城市没找到」和「网络连不上」 |
+| 🔊 | **自定义音效** | 四个场景各自独立：**打招呼**（打开 DSH 时）/ **每轮播报** / **点击** / **余额·预算预警**。每行都能单独开关、试听、上传自己的音效（wav / mp3 / ogg / m4a / flac，单个 ≤ 500 KB），上传成功立刻换声并当场试听，「恢复默认」回到合成提示音；没上传时四类事件的默认音色也不同（点击短促、问候上扬、预警下坠两声），不看屏幕听得出是什么事。同一场景连点会一次次重放（每次都是新的播放源），不会「点一下有声、再点没声」 |
 | 👋 | **开机问候** | 每次打开 DSH，按你设定的昵称用同一套可爱语气问好（按时段分六档台词），配挥手立绘与提示音 |
 | 💬 | **常驻气泡** | 头像旁常驻一个纵向小气泡，顶上一条**峰谷状态带**（圆点 + 高峰/空闲 + 全价/5 折 + 距下次切换的倒计时），下面是你勾选的 1–3 个参数（余额 / 今日已用 / 本机估算 / 本轮消耗 / 峰谷倒计时） |
 | ⏰ | **峰谷定价** | 工作日 9:00–12:00、14:00–18:00 为高峰（全价），其余时段与周末空闲（5 折）：常驻气泡有状态带，详情面板有 **24 小时价档条** 与此刻游标、当前窗口、下一段的时段名，周末倒计时按「天:时」显示 |
@@ -171,6 +172,9 @@ DeepSeek 的 usage 里 `totalTokens = inputTokens + outputTokens + cacheReadToke
 | `/history` | 按模型名或日期检索历史 |
 | `/client-hello` | 前端自检回报（build / 当前情绪），用于排查 |
 | `GET /avatar.png` | 形象 PNG，支持 `?size=128`、`&mood=angry\|blush\|panic\|greet\|think`，带 ETag |
+| `GET /sound` | 自定义音效文件：`?scene=greet\|turn\|click\|warn`，带 ETag（换文件后 rev 变，浏览器自动重新拉取） |
+| `/sound/upload` | 上传音效：`{scene, name, mime, data(base64)}`，单个 ≤ 500 KB；回包直接带新的 `sounds` 元数据 |
+| `/sound/reset` | 删掉某场景的自定义音效、回到默认提示音：`{scene}` |
 
 ## 🛠️ 开发
 
@@ -190,6 +194,8 @@ dsh-ds-whale/
 
 - 改 `lib/client.js`：DSH 的 client-hmr 会热重载（必要时 Ctrl+Shift+R 硬刷新一次，避免旧模块实例叠在新实例下面）。
 - 改 `lib/index.js`：需要重载 Host 半（插件管理器里关/开一次该插件）。
+- 音效文件存在 `$DSH_HOME/dsh-ds-whale-sounds/<scene>`（`greet` / `turn` / `click` / `warn`），元数据跟着 `.dsh-ds-whale.json` 走；直接往目录里放同名文件、或删掉文件，下次启动都会按磁盘重新对账。
+- 音效文件存在 `$DSH_HOME/dsh-ds-whale-sounds/<scene>`（scene = `greet` / `turn` / `click` / `warn`），元数据跟着 `.dsh-ds-whale.json` 走；直接往目录里放同名文件、或删掉文件，下次启动都会按磁盘重新对账。
 - 立绘：`node scripts/gen-avatars.mjs`（需要 DSH 在跑 + 已装 `dsh-agnes-studio` 且配好 `AGNES_API_KEY`）会按 `CHARACTER` + `POSES` 生成六张到 `avatar-out/`；再 `& scripts\finalize-avatars.ps1 -SrcDir avatar-out -OutDir avatar-out\final -Pad 0.02` 做去白底、裁 bbox、导出 512/128/64；最后覆盖 `assets/`。文件前缀固定为 `whale` / `whale-angry` / `whale-blush` / `whale-panic` / `whale-greet` / `whale-think`，宿主按 `MOOD_FILES` 直接发图（`mood=greet` / `mood=think`）。想换成自己的图，放到 `~/.dsh/dsh-ds-whale-assets/` 同名覆盖即可，不用改仓库。
 
 ## 📄 License
