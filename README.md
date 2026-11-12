@@ -8,7 +8,7 @@
 
 **简体中文** · [English](README.en.md)
 
-[![version](https://img.shields.io/badge/version-0.9.12-blue)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.9.13-blue)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![platform](https://img.shields.io/badge/platform-DSH%20Web%20UI-purple)](https://github.com/Iceseas)
 
