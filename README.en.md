@@ -18,7 +18,7 @@
 
 A little whale docked in the bottom-right corner: balance, today's official spend, per-turn cost and the peak/off-peak countdown — all narrated in character.
 
-Install it into your DSH profile, reload once, and she shows up in the bottom-right corner. She greets you by nickname on startup; a left click refreshes the balance (6s cooldown by default); the right-click menu has balance details, today's weather and the settings page. Balance comes from the DSH credential `DEEPSEEK_API_KEY` (or your DSH DeepSeek sign-in), today's spend is pulled straight from the official usage API (the same numbers as `platform.deepseek.com/usage`), every turn's cost is narrated in a cute voice, and she switches between six hand-drawn expressions. Weather is fetched directly from Open-Meteo by the host process — **zero tokens**, never through a model. Everything is stored locally in `$DSH_HOME/.dsh-ds-whale.json`. The UI is available in **中文 / English**, auto-selected from your system locale.
+Install it into your DSH profile, reload once, and she shows up in the bottom-right corner. She greets you by nickname on startup; a left click refreshes the balance (6s cooldown by default); the right-click menu has balance details, today's weather and the settings page. Balance comes from the DSH credential `DEEPSEEK_API_KEY` (or your DSH DeepSeek sign-in), today's spend is pulled straight from the official usage API (the same numbers as `platform.deepseek.com/usage`), every turn's cost is narrated in a cute voice, and she switches between six hand-drawn expressions. Weather is fetched from Open-Meteo by the host process — it uses your system proxy (`HTTPS_PROXY` / Windows proxy settings) when one is configured and falls back to a direct connection — **zero tokens**, never through a model. Everything is stored locally in `$DSH_HOME/.dsh-ds-whale.json`. The UI is available in **中文 / English**, auto-selected from your system locale.
 
 ## ✨ What it does
 
@@ -120,7 +120,7 @@ Either way, **restart DSH** afterwards — the plugin has host-side code (`lib/i
 - Only three outbound requests, all using credentials already on your machine (the third is credential-free):
   1. `GET https://api.deepseek.com/user/balance` (Bearer `DEEPSEEK_API_KEY`)
   2. Official usage `GET https://platform.deepseek.com/api/v0/usage/by_api_key/{amount,cost}` (with the DSH-session `x-dsh-auth-token`)
-  3. Weather (only when you click "Today's weather"): city name → lat/lon, then the forecast. **No credentials, no token, nothing beyond the city you typed**; results are cached in the host process for 10 minutes. Geocoding has three fallbacks: built-in coordinate table for common cities (a hit means no network at all) → `photon.komoot.io` → `geocoding-api.open-meteo.com`; forecasts only go to `api.open-meteo.com`
+  3. Weather (only when you click "Today's weather"): city name → lat/lon, then the forecast. **No credentials, no token, nothing beyond the city you typed**; results are cached in the host process for 10 minutes. Geocoding has three fallbacks: built-in coordinate table for common cities (a hit means no network at all) → `photon.komoot.io` → `geocoding-api.open-meteo.com`; forecasts only go to `api.open-meteo.com`. These host-side requests prefer the local system proxy (`HTTPS_PROXY` / Windows proxy settings) and fall back to a direct connection
 - No hard-coded secrets anywhere; the repo carries no `.env`, credentials or personal paths.
 - "Clear today / clear all / reset baseline" at the bottom of the ledger page wipes the books whenever you want.
 

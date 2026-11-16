@@ -18,7 +18,7 @@
 
 右下角常驻一只会说话的小鲸鱼：余额、官网口径的今日用量、每轮花掉多少钱、峰谷倒计时，全都用拟人语气告诉你。
 
-装进 DSH profile、重启一次，它就会出现在右下角：开机按昵称打招呼；左键点一下立刻刷新余额（默认 6s 冷却）；右键菜单能看余额详情、今日天气、打开设置；余额读 DSH 凭据 `DEEPSEEK_API_KEY`（或 DSH 里的 DeepSeek 登录态）；今日花费直接取官网用量接口，和 `platform.deepseek.com/usage` **同源同数字**；每轮结束用可爱语气播报这轮花了多少；六张手绘立绘随场景切换。天气由宿主进程直连 Open-Meteo，**零 token**，永远不经过模型。所有数据只存在本机 `$DSH_HOME/.dsh-ds-whale.json`。界面支持**中文 / English**，默认跟随系统语言。
+装进 DSH profile、重启一次，它就会出现在右下角：开机按昵称打招呼；左键点一下立刻刷新余额（默认 6s 冷却）；右键菜单能看余额详情、今日天气、打开设置；余额读 DSH 凭据 `DEEPSEEK_API_KEY`（或 DSH 里的 DeepSeek 登录态）；今日花费直接取官网用量接口，和 `platform.deepseek.com/usage` **同源同数字**；每轮结束用可爱语气播报这轮花了多少；六张手绘立绘随场景切换。天气由宿主进程取 Open-Meteo（本机设了系统代理时会自动走代理，否则直连），**零 token**，永远不经过模型。所有数据只存在本机 `$DSH_HOME/.dsh-ds-whale.json`。界面支持**中文 / English**，默认跟随系统语言。
 
 ## ✨ 它做什么
 
@@ -120,7 +120,7 @@ dsh plugin add github:Iceseas/dsh-ds-whale#vX.Y.Z
 - 外部请求只有三条，都用你本机已有的凭据（第三条不带任何凭据）：
   1. `GET https://api.deepseek.com/user/balance`（Bearer `DEEPSEEK_API_KEY`）
   2. 官网用量 `GET https://platform.deepseek.com/api/v0/usage/by_api_key/{amount,cost}`（带 DSH 登录态的 `x-dsh-auth-token`）
-  3. 天气（仅当你点「今日天气」时）：先把城市名换成经纬度，再取预报。**不带凭据、不带 token、不带你填的城市以外的任何信息**，结果在宿主进程内缓存 10 分钟。换经纬度是「三路兜底」：内置常用城市坐标表（命中就完全不联网）→ `photon.komoot.io` → `geocoding-api.open-meteo.com`；取预报只走 `api.open-meteo.com`
+  3. 天气（仅当你点「今日天气」时）：先把城市名换成经纬度，再取预报。**不带凭据、不带 token、不带你填的城市以外的任何信息**，结果在宿主进程内缓存 10 分钟。换经纬度是「三路兜底」：内置常用城市坐标表（命中就完全不联网）→ `photon.komoot.io` → `geocoding-api.open-meteo.com`；取预报只走 `api.open-meteo.com`。宿主的这些请求会优先走本机系统代理（`HTTPS_PROXY` / Windows 代理设置），没有代理或代理连不上时再直连
 - 代码里没有任何硬编码密钥；仓库不含 `.env` / 凭据 / 个人路径。
 - 记录页底部「清空今日 / 清空全部 / 重置基线」可随时抹掉账本。
 
