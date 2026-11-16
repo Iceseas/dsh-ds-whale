@@ -8,7 +8,7 @@
 
 [简体中文](README.md) · **English**
 
-[![version](https://img.shields.io/badge/version-0.9.15-blue)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.9.16-blue)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![platform](https://img.shields.io/badge/platform-DSH%20Web%20UI-purple)](https://github.com/Iceseas)
 
@@ -33,9 +33,10 @@ Install it into your DSH profile, reload once, and she shows up in the bottom-ri
 | 🔊 | **Custom sounds** | Four independent scenes: **greeting** (when DSH opens) / **per-turn narration** / **click** / **balance & budget alert**. Each row has its own on/off, preview, and upload (wav / mp3 / ogg / m4a / flac, ≤ 500 KB each). A successful upload swaps the sound instantly and previews it; "reset to default" goes back to the synthesized chime. Without an upload the four default chimes differ in pitch and rhythm (short click, rising greeting, two-note falling alert), so you can tell events apart without looking. Rapid clicks on the same scene replay every time (each play is a fresh source) — it never goes "sound once, silent after" |
 | 👋 | **Startup greeting** | Every time DSH opens she greets you by your nickname in the same cute voice (six tiers by time of day), with the waving pose and a chime |
 | 💬 | **Persistent bubble** | A small vertical bubble next to the avatar: a **peak/off-peak status strip** on top (dot + peak/idle + full price/50% off + countdown to the next switch), and the 1–3 metrics you picked below (balance / today / local estimate / this turn / peak countdown) |
-| ⏰ | **Peak pricing** | Weekdays 09:00–12:00 and 14:00–18:00 are peak (full price); all other hours and weekends are idle (50% off). The bubble has the status strip, the details panel has a **24-hour price band** with a now-cursor, the current window and the next window's name; weekend countdowns are shown as "d:h" |
+| ⏰ | **Peak pricing** | Weekdays 09:00–12:00 and 14:00–18:00 are peak (full price); all other hours and weekends are idle (50% off). The bubble has the status strip, the details panel pins a **24-hour price band** with a now-cursor at the top, plus the current window and the next window's name; weekend countdowns are shown as "d:h" |
+| 🧭 | **Tabbed details** | The brand-blue hero card at the top pins two primary numbers (available balance / spent today), the 24-hour price band and the current rates; everything else is split into three tabs: **Overview** (today's books with the official cache/input/output split, last round, reconcile link) / **Usage** (range totals, model cost) / **Records** (every entry, search, clear actions). Tabs are a solid-blue segmented control, range filters are small pills, and long content scrolls inside the panel instead of stacking up |
 | 🚨 | **Balance / budget alerts** | Below the warning line or over today's budget she switches to the panicking face and narrates it, with "top up" / "see usage" / "got it" buttons |
-| 📒 | **Usage ledger** | Today / last 7 days / all time, model share, search by model or date; clear today, clear all, reset baseline |
+| 📒 | **Usage ledger** | Inside the **Records** tab: filter by today / last 7 days / all time, search by model or date, entries grouped by day; clear today, clear all, reset baseline |
 | ⚙️ | **Settings page** | A dedicated "小鲸鱼 / Whale" page in **DSH Settings → left nav** (right below 喵记忆), plus the host-generated form at **DSH Settings → Plugins → dsh-ds-whale**. "Open whale settings" in the right-click menu jumps straight to it |
 | 🖱️ | **Feel** | Drag to move with position memory (stores "which edge + how far from that edge", so resizing the window keeps the edge, not the distance), edge snapping judged by the **page midline**, a size slider. The whale can be dragged to the very top of the window — narration bubbles and the details panel then flip below it (based on measured height), and the small persistent bubble follows vertically centered, so nothing gets clipped by the window edge |
 
