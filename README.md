@@ -8,7 +8,7 @@
 
 **简体中文** · [English](README.en.md)
 
-[![version](https://img.shields.io/badge/version-0.9.18-blue)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.10.0-blue)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![platform](https://img.shields.io/badge/platform-DSH%20Web%20UI-purple)](https://github.com/Iceseas)
 
@@ -30,11 +30,16 @@
 | 🎭 | **六种状态立绘** | 平静 / 气鼓鼓（点击受击）/ 脸红（说话中）/ 慌张（余额告警）/ **挥手打招呼（开机问候）** / **托腮思考（在看天气）** |
 | 🖱️ | **左键刷新 · 右键菜单** | 右键（不触发受击抖动）弹出菜单：立即刷新余额 / 查看余额详情 / 去充值 / 今日天气 / 打开小鲸鱼设置；「去充值」一键开官网充值页（优先用 DSH 账号服务给的 `topUpUrl`，取不到就落到 `platform.deepseek.com/top_up`），不用先开面板再点气泡链接；菜单项有明显的悬停高亮与过渡动画 |
 | 🌤️ | **今日天气** | 右键菜单里的「今日天气」：**零 token**；给当前温度、今日区间、降雨概率、接下来三小时的走向，外加一句该带伞还是该补水。第一次用**直接在气泡里填城市**（输入框就在鲸鱼旁边，存好立刻出天气，不用去设置页翻）；城市名换经纬度有三路兜底（内置常用城市表 → photon → Open-Meteo），取预报用 Open-Meteo + wttr.in 双源并发（谁先成功用谁），失败时区分「城市没找到」和「网络连不上」 |
-| 🔊 | **自定义音效** | 四个场景各自独立：**打招呼**（打开 DSH 时）/ **每轮播报** / **点击** / **余额·预算预警**。每行都能单独开关、试听、上传自己的音效（wav / mp3 / ogg / m4a / flac，单个 ≤ 1 MB），上传成功立刻换声并当场试听，「恢复默认」回到合成提示音；没上传时四类事件的默认音色也不同（点击短促、问候上扬、预警下坠两声），不看屏幕听得出是什么事。同一场景连点会先把上一次的播放淡出停掉（约 10ms，不爆音）再放新的，不会叠成一片，也不会「点一下有声、再点没声」 |
+| 🔊 | **自定义音效** | 五个场景各自独立：**打招呼**（打开 DSH 时）/ **每轮播报** / **点击** / **余额·预算预警** / **峰谷切换**。每行都能单独开关、试听、上传自己的音效（wav / mp3 / ogg / m4a / flac，单个 ≤ 1 MB），上传成功立刻换声并当场试听，「恢复默认」回到合成提示音；没上传时五类事件的默认音色也不同（点击短促、问候上扬、预警下坠两声、峰谷三连上行），不看屏幕听得出是什么事。同一场景连点会先把上一次的播放淡出停掉（约 10ms，不爆音）再放新的，不会叠成一片，也不会「点一下有声、再点没声」 |
 | 👋 | **开机问候** | 每次打开 DSH，按你设定的昵称用同一套可爱语气问好（按时段分六档台词），配挥手立绘与提示音 |
 | 💬 | **常驻气泡** | 头像旁常驻一个纵向小气泡，顶上一条**峰谷状态带**（圆点 + 高峰/空闲 + 全价/5 折 + 距下次切换的倒计时），下面是你勾选的 1–3 个参数（余额 / 今日已用 / 本机估算 / 本轮消耗 / 峰谷倒计时） |
 | ⏰ | **峰谷定价** | 工作日 9:00–12:00、14:00–18:00 为高峰（全价），其余时段与周末空闲（5 折）：常驻气泡有状态带，详情面板顶部有 **24 小时价档条** 与此刻游标、当前窗口、下一段的时段名，周末倒计时按「天:时」显示 |
 | 🧭 | **详情面板三页签** | 面板顶部的品牌蓝主卡固定放两个主数字（可用余额 / 今日已用）、24 小时价档带和当前单价，其余按用途分到三个页签：**概览**（今日账本 + 官网缓存/输入/输出拆分、最近一轮、对账入口）/ **用量**（区间汇总、模型费用）/ **记录**（逐条流水、搜索、清账）。页签是实心蓝的分段控件、区间筛选用小胶囊，长内容只在面板内部滚动，不再把所有行铺在一屏里 |
+| 🔔 | **峰谷切换提醒** | 高峰开始 / 空闲时段开始时弹一次气泡（5 秒自动收）并响一声；第五个音效场景「峰谷切换」能单独开关、试听、上传自定义音效。不想被打断就在设置里关掉提醒本身，气泡上的倒计时照旧 |
+| ⚠️ | **异常轮次** | 某轮花费 ≥ 最近 20 轮中位数的 5 倍、且至少多花 1 分钱时，播报里标「⚠ 比平时贵 N 倍」，概览的「最近一轮」也会标黄；样本不足 5 轮不判断 |
+| 📈 | **缓存命中率 · 花费趋势** | 概览的 token 行右侧直接给缓存命中率（≥80% 绿 / ≥50% 灰 / 更低橙）；用量页签有近 14 天柱状图与日均，没有观测数据的那天用本机估算兜底 |
+| 🧮 | **余额构成** | 主卡「充值 / 赠金」下面是一条 3px 细比例条，悬停看各自占比，不占卡片高度 |
+| 🔄 | **新版提示** | 宿主每 6 小时查一次 GitHub Releases（失败 30 分钟后重试、结果落盘，离线 / 限流静默），设置页底部显示「已是最新」或「发现新版本 vX」，也能手动检查 |
 | 🚨 | **余额 / 预算告警** | 低于预警线或超出今日预算时换慌张脸，拟人播报 + 「去充值」/「看用量」+「知道啦」双按钮 |
 | 📒 | **用量记录** | 「记录」页签里按今日 / 近 7 天 / 全部筛选、按模型名或日期搜索，结果按日期分组；可清空今日、清空全部、重置基线 |
 | ⚙️ | **设置页** | 在 **DSH 设置 → 左侧导航** 里有独立一页「小鲸鱼 / Whale」（就在「喵记忆」下方）；同时也在 **DSH 设置 → 插件 → dsh-ds-whale** 由宿主按 schema 自动生成表单。右键菜单里的「打开小鲸鱼设置」会直接跳到这一页 |
@@ -117,10 +122,11 @@ dsh plugin add github:Iceseas/dsh-ds-whale#vX.Y.Z
 
 - 唯一数据文件：`$DSH_HOME/.dsh-ds-whale.json`（Windows 默认 `C:\Users\<你>\.dsh\.dsh-ds-whale.json`），**只存在本机**。
 - 只保存：余额观测、官网用量缓存、每日汇总、每轮金额。**不保存任何对话内容**，不上传任何数据。
-- 外部请求只有三类，都用你本机已有的凭据（第三条不带任何凭据）：
+- 外部请求只有四类，都用你本机已有的凭据（第三条、第四条不带任何凭据）：
   1. `GET https://api.deepseek.com/user/balance`（Bearer `DEEPSEEK_API_KEY`）
   2. 官网用量 `GET https://platform.deepseek.com/api/v0/usage/by_api_key/{amount,cost}`（带 DSH 登录态的 `x-dsh-auth-token`）
   3. 天气（仅当你点「今日天气」时）：先把城市名换成经纬度，再取预报。**不带凭据、不带 token、不带你填的城市以外的任何信息**，结果在宿主进程内缓存 10 分钟。换经纬度是「三路兜底」：内置常用城市坐标表（命中就完全不联网）→ `photon.komoot.io` → `geocoding-api.open-meteo.com`；取预报优先 `api.open-meteo.com`，不通时自动换 `wttr.in`（免 key）。宿主的这些请求会优先走本机系统代理（`HTTPS_PROXY` / Windows 代理设置），没有代理或代理连不上时再直连
+  4. 检查新版（每 6 小时最多一次）：`GET https://api.github.com/repos/Iceseas/dsh-ds-whale/releases`，**不带任何凭据**，只为拿最新版本号；离线或限流时静默跳过
 - 代码里没有任何硬编码密钥；仓库不含 `.env` / 凭据 / 个人路径。
 - 记录页底部「清空今日 / 清空全部 / 重置基线」可随时抹掉账本。
 
@@ -142,6 +148,8 @@ dsh plugin add github:Iceseas/dsh-ds-whale#vX.Y.Z
 | 点击刷新间隔 `clickCooldownMs` | 左键点鲸鱼刷新的最小间隔（2000–120000ms，默认 6000），防止连点打爆余额接口 |
 | 开机打招呼 `greetOnStart` | 每次打开 DSH 是否按昵称问好 |
 | 天气城市 `weatherCity` | 天气用的城市名（例如 `上海` / `Tokyo`）。**必填**：没填时点「今日天气」会直接在气泡里问，填完立刻出天气；设置页里这一栏也支持边打边存（800ms 防抖，不依赖失焦） |
+| 峰谷切换提醒 `peakNotify` | 高峰 / 空闲切换时弹一次气泡并响一声；关掉只保留常驻气泡上的倒计时 |
+| 峰谷切换音效 `soundPeak` | 第五个音效场景：高峰开始 / 空闲时段开始时响一声，可试听、上传自定义文件 |
 | 缓存口径 `cacheInInput` | `inputTokens` 是否已含缓存命中，DeepSeek 不含，保持关闭 |
 
 ## 🧮 定价与算法
@@ -167,13 +175,14 @@ DeepSeek 的 usage 里 `totalTokens = inputTokens + outputTokens + cacheReadToke
 | --- | --- |
 | `/state` | 余额 + 今日（含官网用量）+ 峰谷 + 设置 + 最近记录（自动补刷过期数据） |
 | `/refresh` | 强制刷新余额与官网用量 |
+| `/update` | 手动检查新版（POST）：回包是整份 `/state`，`update` 字段带 `latest / hasUpdate / url` |
 | `/weather` | 今日天气（`{force?, city?}`）：零 token；设置里没城市时返回 `{ok:false, error:"need-city"}`，查不到城市是 `geocode-failed`，联网失败是 `geocode-offline`（两种提示语不同） |
 | `/settings` | 写设置：`{"patch":{...}}` 改运行时，`{"config":{...}}` 写进 profile 的 `cordis.patch.yml` |
 | `/ledger` | `clear-today` / `clear-all` / `ack-adjust` / `rebaseline` |
 | `/history` | 按模型名或日期检索历史 |
 | `/client-hello` | 前端自检回报（build / 当前情绪），用于排查 |
 | `GET /avatar.png` | 形象 PNG，支持 `?size=128`、`&mood=angry\|blush\|panic\|greet\|think`，带 ETag |
-| `GET /sound` | 自定义音效文件：`?scene=greet\|turn\|click\|warn`，带 ETag（换文件后 rev 变，浏览器自动重新拉取） |
+| `GET /sound` | 自定义音效文件：`?scene=greet\|turn\|click\|warn\|peak`，带 ETag（换文件后 rev 变，浏览器自动重新拉取） |
 | `/sound/upload` | 上传音效：`{scene, name, mime, data(base64)}`，单个 ≤ 1 MB；回包直接带新的 `sounds` 元数据 |
 | `/sound/reset` | 删掉某场景的自定义音效、回到默认提示音：`{scene}` |
 
@@ -195,8 +204,7 @@ dsh-ds-whale/
 
 - 改 `lib/client.js`：DSH 的 client-hmr 会热重载（必要时 Ctrl+Shift+R 硬刷新一次，避免旧模块实例叠在新实例下面）。
 - 改 `lib/index.js`：需要重载 Host 半（插件管理器里关/开一次该插件）。
-- 音效文件存在 `$DSH_HOME/dsh-ds-whale-sounds/<scene>`（`greet` / `turn` / `click` / `warn`），元数据跟着 `.dsh-ds-whale.json` 走；直接往目录里放同名文件、或删掉文件，下次启动都会按磁盘重新对账。
-- 音效文件存在 `$DSH_HOME/dsh-ds-whale-sounds/<scene>`（scene = `greet` / `turn` / `click` / `warn`），元数据跟着 `.dsh-ds-whale.json` 走；直接往目录里放同名文件、或删掉文件，下次启动都会按磁盘重新对账。
+- 音效文件存在 `$DSH_HOME/dsh-ds-whale-sounds/<scene>`（scene = `greet` / `turn` / `click` / `warn` / `peak`），元数据跟着 `.dsh-ds-whale.json` 走；直接往目录里放同名文件、或删掉文件，下次启动都会按磁盘重新对账。
 - 立绘：`node scripts/gen-avatars.mjs`（需要 DSH 在跑 + 已装 `dsh-agnes-studio` 且配好 `AGNES_API_KEY`）会按 `CHARACTER` + `POSES` 生成六张到 `avatar-out/`；再 `& scripts\finalize-avatars.ps1 -SrcDir avatar-out -OutDir avatar-out\final -Pad 0.02` 做去白底、裁 bbox、导出 512/128/64；最后覆盖 `assets/`。文件前缀固定为 `whale` / `whale-angry` / `whale-blush` / `whale-panic` / `whale-greet` / `whale-think`，宿主按 `MOOD_FILES` 直接发图（`mood=greet` / `mood=think`）。想换成自己的图，放到 `~/.dsh/dsh-ds-whale-assets/` 同名覆盖即可，不用改仓库。
 
 ## 📄 License

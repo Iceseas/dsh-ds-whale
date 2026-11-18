@@ -8,7 +8,7 @@
 
 [简体中文](README.md) · **English**
 
-[![version](https://img.shields.io/badge/version-0.9.18-blue)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.10.0-blue)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![platform](https://img.shields.io/badge/platform-DSH%20Web%20UI-purple)](https://github.com/Iceseas)
 
@@ -30,11 +30,16 @@ Install it into your DSH profile, reload once, and she shows up in the bottom-ri
 | 🎭 | **Six expressions** | calm / pouting (on click) / blushing (while talking) / panicking (balance warning) / **waving hello (startup greeting)** / **chin on hand (weather)** |
 | 🖱️ | **Left click refresh · right-click menu** | Right click (no hit shake) opens: refresh now / balance details / top up / today's weather / open whale settings. "Top up" opens the official top-up page in one click (prefers the `topUpUrl` from DSH's account service, falls back to `platform.deepseek.com/top_up`) — no need to open a panel first. Menu items have proper hover highlight and transitions |
 | 🌤️ | **Today's weather** | "Today's weather" in the right-click menu: **zero tokens**. Current temperature, today's range, rain probability, the next three hours, plus a line on whether to grab an umbrella or hydrate. First use lets you **type the city right in the bubble** (the input sits next to the whale; save and the weather shows up immediately, no trip to the settings page). City → lat/lon has three fallbacks (built-in city table → photon → Open-Meteo); the forecast races Open-Meteo against wttr.in and takes whichever answers first, and it distinguishes "city not found" from "network unreachable" |
-| 🔊 | **Custom sounds** | Four independent scenes: **greeting** (when DSH opens) / **per-turn narration** / **click** / **balance & budget alert**. Each row has its own on/off, preview, and upload (wav / mp3 / ogg / m4a / flac, ≤ 1 MB each). A successful upload swaps the sound instantly and previews it; "reset to default" goes back to the synthesized chime. Without an upload the four default chimes differ in pitch and rhythm (short click, rising greeting, two-note falling alert), so you can tell events apart without looking. Rapid clicks on the same scene fade the previous playback out (about 10ms, no pop) and start the new one, so clicks never stack into a wall of sound — and it still never goes "sound once, silent after" |
+| 🔊 | **Custom sounds** | Five independent scenes: **greeting** (when DSH opens) / **per-turn narration** / **click** / **balance & budget alert** / **peak switch**. Each row has its own on/off, preview, and upload (wav / mp3 / ogg / m4a / flac, ≤ 1 MB each). A successful upload swaps the sound instantly and previews it; "reset to default" goes back to the synthesized chime. Without an upload the five default chimes differ in pitch and rhythm (short click, rising greeting, two-note falling alert, three-note rise for peak switches), so you can tell events apart without looking. Rapid clicks on the same scene fade the previous playback out (about 10ms, no pop) and start the new one, so clicks never stack into a wall of sound — and it still never goes "sound once, silent after" |
 | 👋 | **Startup greeting** | Every time DSH opens she greets you by your nickname in the same cute voice (six tiers by time of day), with the waving pose and a chime |
 | 💬 | **Persistent bubble** | A small vertical bubble next to the avatar: a **peak/off-peak status strip** on top (dot + peak/idle + full price/50% off + countdown to the next switch), and the 1–3 metrics you picked below (balance / today / local estimate / this turn / peak countdown) |
 | ⏰ | **Peak pricing** | Weekdays 09:00–12:00 and 14:00–18:00 are peak (full price); all other hours and weekends are idle (50% off). The bubble has the status strip, the details panel pins a **24-hour price band** with a now-cursor at the top, plus the current window and the next window's name; weekend countdowns are shown as "d:h" |
 | 🧭 | **Tabbed details** | The brand-blue hero card at the top pins two primary numbers (available balance / spent today), the 24-hour price band and the current rates; everything else is split into three tabs: **Overview** (today's books with the official cache/input/output split, last round, reconcile link) / **Usage** (range totals, model cost) / **Records** (every entry, search, clear actions). Tabs are a solid-blue segmented control, range filters are small pills, and long content scrolls inside the panel instead of stacking up |
+| 🔔 | **Peak-switch reminder** | When peak hours start or end, one bubble pops (auto-dismisses in 5s) and a sound plays; the fifth sound scene ("peak switch") can be toggled, previewed and customized like the others. Turn the reminder off in settings to keep only the countdown |
+| ⚠️ | **Anomalous turn** | When a turn costs at least 5× the median of the last 20 turns (and at least ¥0.01 more), the narration marks it "⚠ N× pricier than usual" and the last round in Overview turns amber; fewer than 5 samples means no judgement |
+| 📈 | **Cache hit rate · spend trend** | The token line in Overview now ends with the cache hit rate (≥80% green / ≥50% grey / lower amber); Usage has a 14-day bar chart with the daily average, falling back to the local estimate for days without observations |
+| 🧮 | **Balance composition** | A 3px split bar under "topped-up / granted" in the hero card; hover for the percentages, no extra height |
+| 🔄 | **New-version hint** | The host checks GitHub Releases every 6 hours (retries after 30 minutes on failure, caches to disk, stays silent offline or rate-limited); the settings page footer shows "up to date" or "new version vX", and you can check manually |
 | 🚨 | **Balance / budget alerts** | Below the warning line or over today's budget she switches to the panicking face and narrates it, with "top up" / "see usage" / "got it" buttons |
 | 📒 | **Usage ledger** | Inside the **Records** tab: filter by today / last 7 days / all time, search by model or date, entries grouped by day; clear today, clear all, reset baseline |
 | ⚙️ | **Settings page** | A dedicated "小鲸鱼 / Whale" page in **DSH Settings → left nav** (right below 喵记忆), plus the host-generated form at **DSH Settings → Plugins → dsh-ds-whale**. "Open whale settings" in the right-click menu jumps straight to it |
@@ -117,10 +122,11 @@ Either way, **restart DSH** afterwards — the plugin has host-side code (`lib/i
 
 - The only data file: `$DSH_HOME/.dsh-ds-whale.json` (Windows default `C:\Users\<you>\.dsh\.dsh-ds-whale.json`), **local only**.
 - It stores: balance observations, official usage cache, daily totals, per-turn amounts. **No conversation content**, nothing uploaded.
-- Only three kinds of outbound requests, all using credentials already on your machine (the third is credential-free):
+- Only four kinds of outbound requests, all using credentials already on your machine (the third and fourth are credential-free):
   1. `GET https://api.deepseek.com/user/balance` (Bearer `DEEPSEEK_API_KEY`)
   2. Official usage `GET https://platform.deepseek.com/api/v0/usage/by_api_key/{amount,cost}` (with the DSH-session `x-dsh-auth-token`)
   3. Weather (only when you click "Today's weather"): city name → lat/lon, then the forecast. **No credentials, no token, nothing beyond the city you typed**; results are cached in the host process for 10 minutes. Geocoding has three fallbacks: built-in coordinate table for common cities (a hit means no network at all) → `photon.komoot.io` → `geocoding-api.open-meteo.com`; forecasts prefer `api.open-meteo.com` and fall back to `wttr.in` (no key) when it is unreachable. These host-side requests prefer the local system proxy (`HTTPS_PROXY` / Windows proxy settings) and fall back to a direct connection
+  4. Update check (at most every 6 hours): `GET https://api.github.com/repos/Iceseas/dsh-ds-whale/releases` — **no credentials at all**, only to read the latest version tag; skipped silently when offline or rate-limited
 - No hard-coded secrets anywhere; the repo carries no `.env`, credentials or personal paths.
 - "Clear today / clear all / reset baseline" at the bottom of the ledger page wipes the books whenever you want.
 
@@ -142,6 +148,8 @@ Either way, **restart DSH** afterwards — the plugin has host-side code (`lib/i
 | Click cooldown `clickCooldownMs` | Minimum interval between left-click refreshes (2000–120000ms, default 6000) so rapid clicking can't hammer the balance API |
 | Startup greeting `greetOnStart` | Whether to greet you by nickname every time DSH opens |
 | Weather city `weatherCity` | City used for weather (e.g. `Shanghai` / `Tokyo`). **Required**: without it, "Today's weather" asks right inside the bubble and shows the result once saved. In the settings page this field also saves as you type (800ms debounce, no blur needed) |
+| Peak-switch reminder `peakNotify` | Pops one bubble and plays a sound when the pricing window switches; off leaves only the countdown |
+| Peak-switch sound `soundPeak` | The fifth sound scene (peak hours start / end); preview and upload work like the others |
 | Cache accounting `cacheInInput` | Whether `inputTokens` already includes cache hits; DeepSeek does not, so keep this off |
 
 ## 🧮 Pricing & math
@@ -167,13 +175,14 @@ Prefix `/api/dsh-ds-whale`, same-origin `POST` (reachable only from the local br
 | --- | --- |
 | `/state` | Balance + today (incl. official usage) + peak hours + settings + recent records (stale data is refetched automatically) |
 | `/refresh` | Force-refresh balance and official usage |
+| `/update` | Manual update check (POST); the response is the full `/state`, with `latest / hasUpdate / url` under `update` |
 | `/weather` | Today's weather (`{force?, city?}`): zero tokens. Returns `{ok:false, error:"need-city"}` when no city is configured, `geocode-failed` when the city isn't found, `geocode-offline` on network failure (the two have different messages) |
 | `/settings` | Write settings: `{"patch":{...}}` changes runtime state, `{"config":{...}}` writes into the profile's `cordis.patch.yml` |
 | `/ledger` | `clear-today` / `clear-all` / `ack-adjust` / `rebaseline` |
 | `/history` | Search history by model name or date |
 | `/client-hello` | Front-end self-report (build / current mood) for troubleshooting |
 | `GET /avatar.png` | Avatar PNG; supports `?size=128` and `&mood=angry\|blush\|panic\|greet\|think`; ETag enabled |
-| `GET /sound` | Custom sound file: `?scene=greet\|turn\|click\|warn`; ETag enabled (rev changes when the file changes, so the browser refetches) |
+| `GET /sound` | Custom sound file: `?scene=greet\|turn\|click\|warn\|peak`; ETag enabled (rev changes when the file changes, so the browser refetches) |
 | `/sound/upload` | Upload a sound: `{scene, name, mime, data(base64)}`, ≤ 1 MB; the response carries the new `sounds` metadata |
 | `/sound/reset` | Drop a scene's custom sound and go back to the default chime: `{scene}` |
 
@@ -195,7 +204,7 @@ dsh-ds-whale/
 
 - Editing `lib/client.js`: DSH's client-hmr hot-reloads it (do one Ctrl+Shift+R hard refresh if needed, so an old module instance doesn't sit under the new one).
 - Editing `lib/index.js`: reload the host half (toggle the plugin off/on in the plugin manager).
-- Sound files live in `$DSH_HOME/dsh-ds-whale-sounds/<scene>` (`greet` / `turn` / `click` / `warn`); metadata travels with `.dsh-ds-whale.json`. Dropping same-named files in that directory (or deleting them) is reconciled from disk on the next start.
+- Sound files live in `$DSH_HOME/dsh-ds-whale-sounds/<scene>` (`greet` / `turn` / `click` / `warn` / `peak`); metadata travels with `.dsh-ds-whale.json`. Dropping same-named files in that directory (or deleting them) is reconciled from disk on the next start.
 - Poses: `node scripts/gen-avatars.mjs` (requires DSH running + `dsh-agnes-studio` installed with `AGNES_API_KEY` configured) generates six images into `avatar-out/` from `CHARACTER` + `POSES`; then `& scripts\finalize-avatars.ps1 -SrcDir avatar-out -OutDir avatar-out\final -Pad 0.02` removes the white background, trims to the bbox and exports 512/128/64; finally overwrite `assets/`. File prefixes are fixed as `whale` / `whale-angry` / `whale-blush` / `whale-panic` / `whale-greet` / `whale-think`; the host serves them straight from `MOOD_FILES` (`mood=greet` / `mood=think`). To use your own art, drop same-named files into `~/.dsh/dsh-ds-whale-assets/` — no repo changes needed.
 
 ## 📄 License
