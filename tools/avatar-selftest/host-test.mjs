@@ -340,5 +340,15 @@ let calmRev = ''
   ok('数据目录：绝对路径解析 + 首次迁移账本/立绘 + 运行期 dataHome 切换')
 }
 
+// 17) 桌面小窗页：内嵌脚本能解析，标题/接口地址存在
+{
+  const html = mod.desktopHtml()
+  assert.ok(html.includes('小鲸鱼'), '桌面页缺少标题')
+  const m = html.match(/<script>([\s\S]*)<\/script>/)
+  assert.ok(m, '桌面页没有内嵌脚本')
+  new Function(m[1])
+  ok('桌面小窗页：HTML 内嵌脚本语法通过')
+}
+
 fs.rmSync(tmpHome, { recursive: true, force: true })
 console.log('\n宿主接口自测通过：' + passed + ' 项')
