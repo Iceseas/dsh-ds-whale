@@ -175,6 +175,19 @@ def phase_one(src):
     add("gray_bg_blush", on_bg(src["blush"], (242, 242, 242)))
     add("cream_bg_greet", on_bg(src["greet"], (250, 244, 232)))
 
+    # 3b) 任意纯色背景：蓝 / 粉 / 深灰 / 绿幕；纯色四边一致，应该自动抠
+    add("blue_bg_angry", on_bg(src["angry"], (47, 111, 237)))
+    add("pink_bg_greet", on_bg(src["greet"], (247, 214, 224)))
+    add("dark_bg_blush", on_bg(src["blush"], (34, 40, 49)))
+    add("green_bg_think", on_bg(src["think"], (0, 177, 64)))
+
+    # 3c) 白色主体 + 纯蓝底：只抠蓝，白甲不能被吃掉
+    armor = Image.new("RGBA", (900, 900), (47, 111, 237, 255))
+    draw = ImageDraw.Draw(armor)
+    draw.rounded_rectangle((260, 200, 640, 760), radius=70, fill=(240, 240, 240, 255), outline=(20, 20, 20, 255), width=8)
+    draw.rounded_rectangle((330, 330, 570, 500), radius=40, fill=(255, 255, 255, 255), outline=(20, 20, 20, 255), width=6)
+    add("white_armor_blue", armor)
+
     small = src["calm"].resize((180, 180), Image.LANCZOS)
     add("small_white_panic", via_jpeg(on_bg(small, (255, 255, 255))))
     add("wide_white_think", via_jpeg(wide_canvas(src["think"])))
@@ -276,6 +289,9 @@ def phase_two(src):
     add("b_jpg_white_angry", on_bg(src["angry"], (255, 255, 255)), ".jpg", "image/jpeg")
     add("b_jpg_white_calm", on_bg(src["calm"], (255, 255, 255)), ".jpg", "image/jpeg", sizes=SIZES_MAIN)
     add("b_gray_bg_blush", on_bg(src["blush"], (242, 242, 242)), ".png", "image/png")
+    add("b_blue_bg_angry", on_bg(src["angry"], (47, 111, 237)), ".jpg", "image/jpeg")
+    add("b_pink_bg_greet", on_bg(src["greet"], (247, 214, 224)), ".png", "image/png")
+    add("b_dark_bg_blush", on_bg(src["blush"], (34, 40, 49)), ".png", "image/png")
     add("b_wide_white_think", wide_canvas(src["think"]), ".jpg", "image/jpeg")
     add("b_photo_like_angry", photo_canvas(src["angry"]), ".png", "image/png")
     add("b_small_calm", on_bg(src["calm"].resize((180, 180), Image.LANCZOS), (255, 255, 255)), ".jpg", "image/jpeg")

@@ -13,7 +13,8 @@ python tools/avatar-selftest/selftest.py <图片目录>      # 换一组测试�
 1. **像素管线**：Pillow 把真图解成 RGBA，直接执行 `lib/client.js` 里
    `avatar-pipeline:begin/end` 之间那段（不是另抄一份），输出 512/128 并算指标：
    四角 alpha、白边像素数、内容占比。会额外造 jpg 白底、浅灰底、米白底、小图、
-   1600×900 非正方形、浅蓝渐变「照片底」（不该抠）等坑。
+   1600×900 非正方形、蓝 / 粉 / 深灰 / 绿幕纯色底、白甲贴蓝底、浅蓝渐变「照片底」
+   （不该抠）等坑。
 2. **浏览器端到端**：起本地 HTTP 服务 + 无头 Chrome，测试页用
    `createImageBitmap` 解码、canvas 编码 PNG，再把 base64 POST 回来 ——
    跑的就是用户上传时走的那条链路。需要本机装有 Chrome。
