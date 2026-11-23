@@ -82,6 +82,8 @@ function ok(label) {
   console.log('  ok  ' + label)
 }
 
+let calmRev = ''
+
 // 1) 正常上传：三张图落盘，元数据带 rev
 {
   const r = await invoke(
@@ -93,6 +95,7 @@ function ok(label) {
   assert.equal(body.ok, true, JSON.stringify(body))
   assert.ok(body.avatars && body.avatars.calm && body.avatars.calm.rev, 'missing avatars.calm')
   assert.equal(body.avatars.calm.name, '测试.png')
+  calmRev = body.avatars.calm.rev
   for (const name of ['whale.png', 'whale-128.png', 'whale-64.png']) {
     assert.ok(fs.existsSync(path.join(mod.avatarDir(), name)), 'missing ' + name)
   }
@@ -114,6 +117,23 @@ function ok(label) {
   assert.equal(r.status, 200)
   assert.ok(r.body.equals(png128), '128 缩略图没换')
   ok('/avatar.png?size=128 同步换图')
+}
+
+// 3b) 默认缓存键（d1 / 0）只发包内 assets；自定义 rev 仍返回上传图
+{
+  const pkg512 = fs.readFileSync(path.join(root, 'assets', 'whale.png'))
+  const pkg128 = fs.readFileSync(path.join(root, 'assets', 'whale-128.png'))
+  for (const token of ['d1', '0']) {
+    const r = await invoke(avatarPng, makeReq(PREFIX + '/avatar.png?size=512&v=' + token))
+    assert.equal(r.status, 200)
+    assert.ok(r.body.equals(pkg512), '默认 token ' + token + ' 没有返回包内 assets')
+  }
+  const r128 = await invoke(avatarPng, makeReq(PREFIX + '/avatar.png?size=128&v=d1'))
+  assert.equal(r128.status, 200)
+  assert.ok(r128.body.equals(pkg128), '128 默认 token 没回包内 assets')
+  const rRev = await invoke(avatarPng, makeReq(PREFIX + '/avatar.png?size=512&v=' + calmRev))
+  assert.ok(rRev.body.equals(png512), '自定义 rev 没返回上传图')
+  ok('默认缓存键 d1/0 只发包内 assets；自定义 rev 仍返回上传图')
 }
 
 // 4) 尺寸不对 -> bad-size，且不破坏已有文件
