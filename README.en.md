@@ -20,6 +20,8 @@ A little whale docked in the bottom-right corner: balance, today's official spen
 
 Install it into your DSH profile, reload once, and she shows up in the bottom-right corner. She greets you by nickname on startup; a left click refreshes the balance (6s cooldown by default); the right-click menu has balance details, today's weather and the settings page. Balance comes from the DSH credential `DEEPSEEK_API_KEY` (or your DSH DeepSeek sign-in), today's spend is pulled straight from the official usage API (the same numbers as `platform.deepseek.com/usage`), every turn's cost is narrated in a cute voice, and she switches between six hand-drawn expressions. Weather is fetched from Open-Meteo by the host process, with `wttr.in` as an automatic fallback; it uses your system proxy (`HTTPS_PROXY` / Windows proxy settings) when one is configured and falls back to a direct connection — **zero tokens**, never through a model. Everything is stored locally in `$DSH_HOME/.dsh-ds-whale.json`. The UI is available in **中文 / English**, auto-selected from your system locale.
 
+> **1.0 stable**: APIs and settings are frozen. The headline addition is **swapping poses right in Settings** — upload jpg / png / webp / bmp and the browser removes the background, crops and scales it; no scripts, no file juggling.
+
 ## ✨ What it does
 
 | | Feature | Details |
@@ -28,6 +30,7 @@ Install it into your DSH profile, reload once, and she shows up in the bottom-ri
 | 📊 | **Today's spend (official)** | Calls DeepSeek's usage endpoints `/api/v0/usage/by_api_key/{amount,cost}` directly, so money / requests / tokens match `platform.deepseek.com/usage` **exactly**. If the endpoint is unreachable it falls back to the balance-delta reading and labels that in the UI |
 | 🗣️ | **Narrated turns** | After every turn she says, in character, how much that turn cost (5 tiers by amount), with model and input/output tokens in the sub-line. **Only closes on "got it~"** — never auto-dismisses |
 | 🎭 | **Six expressions** | calm / pouting (on click) / blushing (while talking) / panicking (balance warning) / **waving hello (startup greeting)** / **chin on hand (weather)** |
+| 🎨 | **Swap poses in Settings** | One row per expression: upload a jpg / png / webp / bmp and the browser removes the white (or light) background, crops the character to a square and exports 512 / 128 (plus 64 for the idle pose) into `$DSH_HOME/dsh-ds-whale-assets/` — no scripts and no file juggling for white-background JPGs. If one image is cut badly, turn off “Auto-remove light background”; “Use default” restores the bundled art |
 | 🖱️ | **Left click refresh · right-click menu** | Right click (no hit shake) opens: refresh now / balance details / top up / today's weather / open whale settings. "Top up" opens the official top-up page in one click (prefers the `topUpUrl` from DSH's account service, falls back to `platform.deepseek.com/top_up`) — no need to open a panel first. Menu items have proper hover highlight and transitions |
 | 🌤️ | **Today's weather** | "Today's weather" in the right-click menu: **zero tokens**. Current temperature, today's range, rain probability, the next three hours, plus a line on whether to grab an umbrella or hydrate. First use lets you **type the city right in the bubble** (the input sits next to the whale; save and the weather shows up immediately, no trip to the settings page). City → lat/lon has three fallbacks (built-in city table → photon → Open-Meteo); the forecast races Open-Meteo against wttr.in and takes whichever answers first, and it distinguishes "city not found" from "network unreachable" |
 | 🔊 | **Custom sounds** | Five independent scenes: **greeting** (when DSH opens) / **per-turn narration** / **click** / **balance & budget alert** / **peak switch**. Each row has its own on/off, preview, and upload (wav / mp3 / ogg / m4a / flac, ≤ 1 MB each). A successful upload swaps the sound instantly and previews it; "reset to default" goes back to the synthesized chime. Without an upload the five default chimes differ in pitch and rhythm (short click, rising greeting, two-note falling alert, three-note rise for peak switches), so you can tell events apart without looking. Rapid clicks on the same scene fade the previous playback out (about 10ms, no pop) and start the new one, so clicks never stack into a wall of sound — and it still never goes "sound once, silent after" |
@@ -97,7 +100,7 @@ git clone https://github.com/Iceseas/dsh-ds-whale.git
 
 ## ⬆️ Update
 
-To see the current version: whale panel → Settings; the bottom line shows `版本 vX.Y.Z` and "view new version" (goes to the Releases list). For the latest version see [Releases](https://github.com/Iceseas/dsh-ds-whale/releases) (everything in 0.x ships as a Pre-release, so the repo's Releases card hides it and `/releases/latest` doesn't point at it — **display-only, install and update are unaffected**).
+To see the current version: whale panel → Settings; the bottom line shows `版本 vX.Y.Z` and "view new version" (goes to the Releases list). For the latest version see [Releases](https://github.com/Iceseas/dsh-ds-whale/releases) (from 1.0 on, releases are published as stable — the repo's Releases card and `/releases/latest` point at them; the 0.x history shipped as Pre-releases, which only affected display, not install or update).
 
 **Installed without a version pin** (`github:Iceseas/dsh-ds-whale`) — tracks the default branch, one command:
 
@@ -105,7 +108,7 @@ To see the current version: whale panel → Settings; the bottom line shows `版
 dsh plugin update dsh-ds-whale
 ```
 
-**Pinned to a tag** (`.../dsh-ds-whale#v0.9.8`) — `update` won't cross versions, switch the tag explicitly:
+**Pinned to a tag** (`.../dsh-ds-whale#v1.0.0`) — `update` won't cross versions, switch the tag explicitly:
 
 ```bash
 # replace vX.Y.Z with the target tag (pick the latest one from Releases)
@@ -137,6 +140,8 @@ Either way, **restart DSH** afterwards — the plugin has host-side code (`lib/i
 | UI language `language` | `auto` follows the system locale / `zh` Chinese / `en` English; in English both the UI and the narration are fully English |
 | Nickname `nickname` | How she addresses you in narration (up to 16 chars; leave empty to skip names) |
 | Size `scale` | 0.6–2× |
+| Auto-remove background `avatarAutoMatte` | Flood-fills a light (white / cream / light grey) background from the four edges and cleans the white fringe along the silhouette when uploading art; turn it off to only crop and scale |
+| Avatar padding `avatarPad` | Empty margin kept when cropping to a square (0–0.25, default 0.05 = 5%); smaller means a bigger character |
 | Bubble metrics `miniFields` | `balance` / `today` / `estimate` / `turn` / `peak`, up to 3 |
 | Per-turn narration `turnPop` | Turn it off and no narration popup appears |
 | Warning line `warnBelow` | Below this value she switches to the panicking face; 0 = off |
@@ -182,6 +187,8 @@ Prefix `/api/dsh-ds-whale`, same-origin `POST` (reachable only from the local br
 | `/history` | Search history by model name or date |
 | `/client-hello` | Front-end self-report (build / current mood) for troubleshooting |
 | `GET /avatar.png` | Avatar PNG; supports `?size=128` and `&mood=angry\|blush\|panic\|greet\|think`; ETag enabled |
+| `/avatar/upload` | Upload art: `{mood, name, big, small, tiny}` — three browser-processed PNGs at 512 / 128 (plus 64 for calm), base64; the host only validates the PNG signature and dimensions before writing, and responds with the new `avatars` metadata |
+| `/avatar/reset` | Drop one pose's custom art and fall back to the bundled assets: `{mood}` |
 | `GET /sound` | Custom sound file: `?scene=greet\|turn\|click\|warn\|peak`; ETag enabled (rev changes when the file changes, so the browser refetches) |
 | `/sound/upload` | Upload a sound: `{scene, name, mime, data(base64)}`, ≤ 1 MB; the response carries the new `sounds` metadata |
 | `/sound/reset` | Drop a scene's custom sound and go back to the default chime: `{scene}` |
@@ -198,6 +205,7 @@ dsh-ds-whale/
 ├── scripts/cut-bg.ps1       # white → transparent (4-edge flood fill + edge feathering)
 ├── scripts/build-avatar.ps1 # trim to bbox + downscale to 512/128/64
 ├── scripts/finalize-avatars.ps1 # chains the two steps above
+├── tools/avatar-selftest/      # upload-pipeline self-test (pixels + headless Chrome + host routes)
 ├── cordis.patch.yml  # plugin line declaration
 └── package.json
 ```
@@ -205,7 +213,7 @@ dsh-ds-whale/
 - Editing `lib/client.js`: DSH's client-hmr hot-reloads it (do one Ctrl+Shift+R hard refresh if needed, so an old module instance doesn't sit under the new one).
 - Editing `lib/index.js`: reload the host half (toggle the plugin off/on in the plugin manager).
 - Sound files live in `$DSH_HOME/dsh-ds-whale-sounds/<scene>` (`greet` / `turn` / `click` / `warn` / `peak`); metadata travels with `.dsh-ds-whale.json`. Dropping same-named files in that directory (or deleting them) is reconciled from disk on the next start.
-- Poses: `node scripts/gen-avatars.mjs` (requires DSH running + `dsh-agnes-studio` installed with `AGNES_API_KEY` configured) generates six images into `avatar-out/` from `CHARACTER` + `POSES`; then `& scripts\finalize-avatars.ps1 -SrcDir avatar-out -OutDir avatar-out\final -Pad 0.02` removes the white background, trims to the bbox and exports 512/128/64; finally overwrite `assets/`. File prefixes are fixed as `whale` / `whale-angry` / `whale-blush` / `whale-panic` / `whale-greet` / `whale-think`; the host serves them straight from `MOOD_FILES` (`mood=greet` / `mood=think`). To use your own art, drop same-named files into `~/.dsh/dsh-ds-whale-assets/` — no repo changes needed.
+- Poses: `node scripts/gen-avatars.mjs` (requires DSH running + `dsh-agnes-studio` installed with `AGNES_API_KEY` configured) generates six images into `avatar-out/` from `CHARACTER` + `POSES`; then `& scripts\finalize-avatars.ps1 -SrcDir avatar-out -OutDir avatar-out\final -Pad 0.02` removes the white background, trims to the bbox and exports 512/128/64; finally overwrite `assets/`. File prefixes are fixed as `whale` / `whale-angry` / `whale-blush` / `whale-panic` / `whale-greet` / `whale-think`; the host serves them straight from `MOOD_FILES` (`mood=greet` / `mood=think`). Swapping art no longer means touching files: use the six upload rows under “Avatar art” in Settings (the browser removes the background, crops and scales — white JPG borders included). The scripts remain for batch generation, and dropping same-named files into `~/.dsh/dsh-ds-whale-assets/` still works. After changing the algorithm run `python tools/avatar-selftest/selftest.py`: it covers the pixel pipeline, a headless-Chrome end-to-end pass and the host routes.
 
 ## 📄 License
 

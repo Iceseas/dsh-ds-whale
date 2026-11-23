@@ -10,6 +10,12 @@ assets-src/
 _tmp-*
 *.log
 *.tmp
+
+# 立绘自测产物（本地跑工具生成，不入库）
+tools/avatar-selftest/work/
+__pycache__/
+*.pyc
+
 .tsbuildinfo
 
 .DS_Store

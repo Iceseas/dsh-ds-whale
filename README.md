@@ -20,6 +20,8 @@
 
 装进 DSH profile、重启一次，它就会出现在右下角：开机按昵称打招呼；左键点一下立刻刷新余额（默认 6s 冷却）；右键菜单能看余额详情、今日天气、打开设置；余额读 DSH 凭据 `DEEPSEEK_API_KEY`（或 DSH 里的 DeepSeek 登录态）；今日花费直接取官网用量接口，和 `platform.deepseek.com/usage` **同源同数字**；每轮结束用可爱语气播报这轮花了多少；六张手绘立绘随场景切换。天气由宿主进程取 Open-Meteo（取不到时自动换 wttr.in 兜底；本机设了系统代理时自动走代理，否则直连），**零 token**，永远不经过模型。所有数据只存在本机 `$DSH_HOME/.dsh-ds-whale.json`。界面支持**中文 / English**，默认跟随系统语言。
 
+> **1.0 正式版**：接口与设置项已冻结。最大的新增是**设置页直接换立绘**——上传 jpg / png / webp / bmp，自动去白底、按人物裁切缩放，不用再跑脚本，也不用手动换文件。
+
 ## ✨ 它做什么
 
 | | 能力 | 说明 |
@@ -28,6 +30,7 @@
 | 📊 | **今日已用（官网口径）** | 直接调 DeepSeek 官网用量接口 `/api/v0/usage/by_api_key/{amount,cost}`，金额 / 请求数 / tokens 与 `platform.deepseek.com/usage` 页面**同源同数字**；接口不通时自动退回「余额下降」口径并在标签上标明 |
 | 🗣️ | **拟人播报** | 每轮对话结束，用小鲸鱼的口吻把本轮花了多少钱说出来（按金额分 5 档台词），副行给模型与入/出 token；**必须点「知道啦~」才关闭**，不会自己消失 |
 | 🎭 | **六种状态立绘** | 平静 / 气鼓鼓（点击受击）/ 脸红（说话中）/ 慌张（余额告警）/ **挥手打招呼（开机问候）** / **托腮思考（在看天气）** |
+| 🎨 | **设置页直接换立绘** | 六种状态各一行：上传 jpg / png / webp / bmp 就行，浏览器里自动去掉白 / 浅色底、按人物裁成正方形、导出 512 / 128（待机另带 64）写进 `$DSH_HOME/dsh-ds-whale-assets/` —— 白底 jpg 不用再跑脚本，也不用手动换文件；被抠坏了可关掉「自动去白底」，或点「恢复默认」回到内置立绘 |
 | 🖱️ | **左键刷新 · 右键菜单** | 右键（不触发受击抖动）弹出菜单：立即刷新余额 / 查看余额详情 / 去充值 / 今日天气 / 打开小鲸鱼设置；「去充值」一键开官网充值页（优先用 DSH 账号服务给的 `topUpUrl`，取不到就落到 `platform.deepseek.com/top_up`），不用先开面板再点气泡链接；菜单项有明显的悬停高亮与过渡动画 |
 | 🌤️ | **今日天气** | 右键菜单里的「今日天气」：**零 token**；给当前温度、今日区间、降雨概率、接下来三小时的走向，外加一句该带伞还是该补水。第一次用**直接在气泡里填城市**（输入框就在鲸鱼旁边，存好立刻出天气，不用去设置页翻）；城市名换经纬度有三路兜底（内置常用城市表 → photon → Open-Meteo），取预报用 Open-Meteo + wttr.in 双源并发（谁先成功用谁），失败时区分「城市没找到」和「网络连不上」 |
 | 🔊 | **自定义音效** | 五个场景各自独立：**打招呼**（打开 DSH 时）/ **每轮播报** / **点击** / **余额·预算预警** / **峰谷切换**。每行都能单独开关、试听、上传自己的音效（wav / mp3 / ogg / m4a / flac，单个 ≤ 1 MB），上传成功立刻换声并当场试听，「恢复默认」回到合成提示音；没上传时五类事件的默认音色也不同（点击短促、问候上扬、预警下坠两声、峰谷三连上行），不看屏幕听得出是什么事。同一场景连点会先把上一次的播放淡出停掉（约 10ms，不爆音）再放新的，不会叠成一片，也不会「点一下有声、再点没声」 |
@@ -97,7 +100,7 @@ git clone https://github.com/Iceseas/dsh-ds-whale.git
 
 ## ⬆️ 更新
 
-看当前版本：小鲸鱼面板 → 设置，最底部那行有 `版本 vX.Y.Z` 和「查看新版」（直通 Releases 列表）。最新版看 [Releases](https://github.com/Iceseas/dsh-ds-whale/releases)（0.x 阶段都按 Pre-release 发，仓库首页的 Releases 卡片不显示，`/releases/latest` 也不指向它——**这只影响展示，不影响安装和更新**）。
+看当前版本：小鲸鱼面板 → 设置，最底部那行有 `版本 vX.Y.Z` 和「查看新版」（直通 Releases 列表）。最新版看 [Releases](https://github.com/Iceseas/dsh-ds-whale/releases)（1.0 起按正式版发布，仓库首页的 Releases 卡片和 `/releases/latest` 都会指向它；0.x 历史版本当时按 Pre-release 发，只影响展示，不影响安装和更新）。
 
 **装的时候没写版本号**（`github:Iceseas/dsh-ds-whale`）——跟默认分支最新，一条命令：
 
@@ -105,7 +108,7 @@ git clone https://github.com/Iceseas/dsh-ds-whale.git
 dsh plugin update dsh-ds-whale
 ```
 
-**装的时候锁了 tag**（`.../dsh-ds-whale#v0.9.8`）——`update` 不会跨版本，要显式换 tag：
+**装的时候锁了 tag**（`.../dsh-ds-whale#v1.0.0`）——`update` 不会跨版本，要显式换 tag：
 
 ```bash
 # 把 vX.Y.Z 换成目标版本的 tag（在 Releases 里挑最新那个）
@@ -137,6 +140,8 @@ dsh plugin add github:Iceseas/dsh-ds-whale#vX.Y.Z
 | 界面语言 `language` | `auto` 跟随系统区域 / `zh` 中文 / `en` English，英文下界面与播报全英文 |
 | 昵称 `nickname` | 播报里怎么称呼你（最多 16 字，留空则不喊名字） |
 | 形象大小 `scale` | 0.6–2 倍 |
+| 自动去白底 `avatarAutoMatte` | 上传立绘时从四边泛洪抠掉浅色（白 / 米白 / 浅灰）背景，并把边缘混进去的白边一起清掉；关掉则只按透明区域裁切缩放 |
+| 形象留白 `avatarPad` | 裁正方形时四周留的空隙（0–0.25，默认 0.05 = 5%），越小人物越大 |
 | 常驻气泡参数 `miniFields` | `balance` / `today` / `estimate` / `turn` / `peak`，最多 3 个 |
 | 每轮消耗播报 `turnPop` | 关掉就不弹播报 |
 | 余额预警线 `warnBelow` | 低于该值换慌张脸提醒，0 = 关闭 |
@@ -182,6 +187,8 @@ DeepSeek 的 usage 里 `totalTokens = inputTokens + outputTokens + cacheReadToke
 | `/history` | 按模型名或日期检索历史 |
 | `/client-hello` | 前端自检回报（build / 当前情绪），用于排查 |
 | `GET /avatar.png` | 形象 PNG，支持 `?size=128`、`&mood=angry\|blush\|panic\|greet\|think`，带 ETag |
+| `/avatar/upload` | 上传立绘：`{mood, name, big, small, tiny}`，三张都是浏览器处理好的 512 / 128（calm 还有 64）PNG（base64）；宿主只校验 PNG 与尺寸再落盘，回包带新的 `avatars` 元数据 |
+| `/avatar/reset` | 删掉某个状态的自定义立绘、回落到包内 assets：`{mood}` |
 | `GET /sound` | 自定义音效文件：`?scene=greet\|turn\|click\|warn\|peak`，带 ETag（换文件后 rev 变，浏览器自动重新拉取） |
 | `/sound/upload` | 上传音效：`{scene, name, mime, data(base64)}`，单个 ≤ 1 MB；回包直接带新的 `sounds` 元数据 |
 | `/sound/reset` | 删掉某场景的自定义音效、回到默认提示音：`{scene}` |
@@ -198,6 +205,7 @@ dsh-ds-whale/
 ├── scripts/cut-bg.ps1       # 白底转透明（四边泛洪 + 边缘羽化）
 ├── scripts/build-avatar.ps1 # 裁 bbox + 缩 512/128/64
 ├── scripts/finalize-avatars.ps1 # 串起上面两步
+├── tools/avatar-selftest/      # 立绘上传链路自测（像素 + 无头 Chrome + 宿主路由）
 ├── cordis.patch.yml  # 插件行声明
 └── package.json
 ```
@@ -205,7 +213,7 @@ dsh-ds-whale/
 - 改 `lib/client.js`：DSH 的 client-hmr 会热重载（必要时 Ctrl+Shift+R 硬刷新一次，避免旧模块实例叠在新实例下面）。
 - 改 `lib/index.js`：需要重载 Host 半（插件管理器里关/开一次该插件）。
 - 音效文件存在 `$DSH_HOME/dsh-ds-whale-sounds/<scene>`（scene = `greet` / `turn` / `click` / `warn` / `peak`），元数据跟着 `.dsh-ds-whale.json` 走；直接往目录里放同名文件、或删掉文件，下次启动都会按磁盘重新对账。
-- 立绘：`node scripts/gen-avatars.mjs`（需要 DSH 在跑 + 已装 `dsh-agnes-studio` 且配好 `AGNES_API_KEY`）会按 `CHARACTER` + `POSES` 生成六张到 `avatar-out/`；再 `& scripts\finalize-avatars.ps1 -SrcDir avatar-out -OutDir avatar-out\final -Pad 0.02` 做去白底、裁 bbox、导出 512/128/64；最后覆盖 `assets/`。文件前缀固定为 `whale` / `whale-angry` / `whale-blush` / `whale-panic` / `whale-greet` / `whale-think`，宿主按 `MOOD_FILES` 直接发图（`mood=greet` / `mood=think`）。想换成自己的图，放到 `~/.dsh/dsh-ds-whale-assets/` 同名覆盖即可，不用改仓库。
+- 立绘：`node scripts/gen-avatars.mjs`（需要 DSH 在跑 + 已装 `dsh-agnes-studio` 且配好 `AGNES_API_KEY`）会按 `CHARACTER` + `POSES` 生成六张到 `avatar-out/`；再 `& scripts\finalize-avatars.ps1 -SrcDir avatar-out -OutDir avatar-out\final -Pad 0.02` 做去白底、裁 bbox、导出 512/128/64；最后覆盖 `assets/`。文件前缀固定为 `whale` / `whale-angry` / `whale-blush` / `whale-panic` / `whale-greet` / `whale-think`，宿主按 `MOOD_FILES` 直接发图（`mood=greet` / `mood=think`）。现在换立绘不用再碰文件：设置页「形象立绘」六行各自上传即可（浏览器端自动去白底 / 裁边 / 缩放，jpg 的白边也能处理）。脚本仍保留给批量生成用；手动放 `~/.dsh/dsh-ds-whale-assets/` 同名覆盖也依然生效。改了算法就跑 `python tools/avatar-selftest/selftest.py`：像素管线、无头 Chrome 端到端、宿主路由校验三段一起过。
 
 ## 📄 License
 
