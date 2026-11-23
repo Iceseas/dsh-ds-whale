@@ -8,7 +8,7 @@
 
 **简体中文** · [English](README.en.md)
 
-[![version](https://img.shields.io/badge/version-1.0.0-blue)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-1.1.0-blue)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![platform](https://img.shields.io/badge/platform-DSH%20Web%20UI-purple)](https://github.com/Iceseas)
 
@@ -108,7 +108,7 @@ git clone https://github.com/Iceseas/dsh-ds-whale.git
 dsh plugin update dsh-ds-whale
 ```
 
-**装的时候锁了 tag**（`.../dsh-ds-whale#v1.0.0`）——`update` 不会跨版本，要显式换 tag：
+**装的时候锁了 tag**（`.../dsh-ds-whale#vX.Y.Z`）——`update` 不会跨版本，要显式换 tag：
 
 ```bash
 # 把 vX.Y.Z 换成目标版本的 tag（在 Releases 里挑最新那个）

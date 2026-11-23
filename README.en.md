@@ -8,7 +8,7 @@
 
 [简体中文](README.md) · **English**
 
-[![version](https://img.shields.io/badge/version-1.0.0-blue)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-1.1.0-blue)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![platform](https://img.shields.io/badge/platform-DSH%20Web%20UI-purple)](https://github.com/Iceseas)
 
@@ -108,7 +108,7 @@ To see the current version: whale panel → Settings; the bottom line shows `版
 dsh plugin update dsh-ds-whale
 ```
 
-**Pinned to a tag** (`.../dsh-ds-whale#v1.0.0`) — `update` won't cross versions, switch the tag explicitly:
+**Pinned to a tag** (`.../dsh-ds-whale#vX.Y.Z`) — `update` won't cross versions, switch the tag explicitly:
 
 ```bash
 # replace vX.Y.Z with the target tag (pick the latest one from Releases)
