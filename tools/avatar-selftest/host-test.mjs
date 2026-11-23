@@ -317,5 +317,28 @@ let calmRev = ''
   ok('settings 写入队列：同一时刻只有一个在写')
 }
 
+// 16) 自定义数据目录：解析绝对路径、首次迁移账本/立绘、运行期切换 dataHome
+{
+  const prevHome = mod.dataHome()
+  const src = fs.mkdtempSync(path.join(os.tmpdir(), 'whale-data-src-'))
+  const dst = fs.mkdtempSync(path.join(os.tmpdir(), 'whale-data-dst-'))
+  fs.mkdirSync(path.join(src, 'dsh-ds-whale-assets'), { recursive: true })
+  fs.writeFileSync(path.join(src, '.dsh-ds-whale.json'), '{"v":1}')
+  fs.writeFileSync(path.join(src, 'dsh-ds-whale-assets', 'whale.png'), 'fake')
+  const res = mod.resolveDataHome({}, { dataDir: dst })
+  assert.equal(path.resolve(res), path.resolve(dst))
+  const mig = mod.migrateDataHome(src, dst)
+  assert.ok(mig.copied.includes('.dsh-ds-whale.json'), '账本没有复制')
+  assert.ok(mig.copied.includes('dsh-ds-whale-assets'), '立绘目录没有复制')
+  assert.ok(fs.existsSync(path.join(dst, 'dsh-ds-whale-assets', 'whale.png')), '立绘文件没有复制')
+  mod.setDataHome(dst)
+  assert.equal(path.resolve(mod.dataHome()), path.resolve(dst))
+  assert.equal(path.resolve(mod.avatarDir()), path.resolve(path.join(dst, 'dsh-ds-whale-assets')))
+  mod.setDataHome(prevHome)
+  fs.rmSync(src, { recursive: true, force: true })
+  fs.rmSync(dst, { recursive: true, force: true })
+  ok('数据目录：绝对路径解析 + 首次迁移账本/立绘 + 运行期 dataHome 切换')
+}
+
 fs.rmSync(tmpHome, { recursive: true, force: true })
 console.log('\n宿主接口自测通过：' + passed + ' 项')
